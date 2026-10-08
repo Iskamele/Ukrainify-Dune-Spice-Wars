@@ -10,7 +10,7 @@ one row:
   EN         the game's English
   UA         the translation: edit it in place
   відмінки   names only, "Н; Р; Д; З; О; М | Н; Р; Д; З; О; М": edit in place
-  вичитано   put anything here (+) once the row is checked
+  вичитано   put anything here (✓, +) once the row is checked
   дата       filled in by the tool: the day the row was marked
   коментар   free notes, kept as they are
   відбиток   filled in by the tool: what the row said when it was written out
@@ -151,7 +151,7 @@ def sync():
     rows = []
     for key, (ua, forms) in after.items():
         rows.append({'ключ': key, 'розділ': section(key), 'EN': source[key]['en'], 'UA': ua, 'відмінки': forms,
-                     'вичитано': '+' if key in marks else '', 'дата': marks.get(key, ''),
+                     'вичитано': '✓' if key in marks else '', 'дата': marks.get(key, ''),
                      'коментар': notes.get(key, ''), 'відбиток': fingerprint(ua, forms)})
     write_sheet(rows)
 
