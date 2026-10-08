@@ -66,7 +66,9 @@ def stem(word):
     """A forgiving Ukrainian stem: drop the ending, let і/о alternate
     (Дім/Дому), ignore case and apostrophes."""
     w = word.lower().replace("'", '')
-    if len(w) > 4:
+    if w.endswith('ець') and len(w) > 5:          # продавець / продавці: the е drops out
+        w = w[:-3]
+    elif len(w) > 4:
         w = w[:-2]
     elif len(w) == 4:
         w = w[:-1]
@@ -107,9 +109,17 @@ def check(entries, source, charset, terms=None):
                 add('same', key, 'identical to the English')
             plain_en = d4x.LINK_RE.sub(' ', en)
             plain_uk = d4x.LINK_RE.sub(' ', uk).replace("'", '')
-            for en_re, stems, label in terms:
-                if en_re.search(plain_en) and not all(st.search(plain_uk) for st in stems):
-                    add('term', key, label)
+            hits = [(m.span(), stems, label) for en_re, stems, label in terms for m in en_re.finditer(plain_en)]
+            spans = [h[0] for h in hits]
+            missed = []
+            for (a, b), stems, label in hits:
+                # a term inside a longer one ("Shield" in "Shield Wall") is that one's business
+                if any(c <= a and b <= d and (c, d) != (a, b) for c, d in spans):
+                    continue
+                if label not in missed and not all(st.search(plain_uk) for st in stems):
+                    missed.append(label)
+            for label in missed:
+                add('term', key, label)
         if not d4x.tags_balanced(uk):
             add('xml', key, 'unbalanced tags')
         # | splits lists (names, tutorial goals, option levels): counts must

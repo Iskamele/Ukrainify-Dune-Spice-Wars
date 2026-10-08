@@ -25,16 +25,8 @@ try:
 except ImportError:
     sys.exit('needs openpyxl:  pip install openpyxl')
 
-CASES_SG = ['nominativeLc', 'genitive', 'dative', 'accusative', 'instrumental', 'prepositional']
 EDIT = PatternFill('solid', fgColor='FFF6D5')
-
-
-def forms_of(base, entries):
-    head, field = base.rsplit('/texts.', 1)
-    get = lambda case: entries.get('%s/texts.%s.%s' % (head, case, field), {}).get('uk', '')
-    sg = [get(c) for c in CASES_SG]
-    pl = [get(c + 'Plural') for c in CASES_SG]
-    return '' if not any(sg + pl) else '; '.join(sg) + ' | ' + '; '.join(pl)
+forms_of = merge.forms_of
 
 
 def export(name, prefixes, everything=False):

@@ -459,7 +459,9 @@ def read_tsv(path):
     if not os.path.isfile(path):
         return []
     with open(path, encoding='utf-8', newline='') as f:
-        lines = f.read().split('\n')
+        # a checkout with core.autocrlf turns the record ends into \r\n; real
+        # line breaks inside a field are always escaped as \n, so \r never belongs
+        lines = f.read().replace('\r\n', '\n').split('\n')
     head = lines[0].split('\t')
     return [dict(zip(head, map(unesc, l.split('\t')))) for l in lines[1:] if l]
 

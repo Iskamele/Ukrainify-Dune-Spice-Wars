@@ -63,6 +63,26 @@ def expand(base_key, spec, source):
     return {k: v for k, v in out.items() if k in source}
 
 
+CASES_SG = ['nominativeLc', 'genitive', 'dative', 'accusative', 'instrumental', 'prepositional']
+
+
+def forms_of(base_key, entries):
+    """the inverse of expand: a name's current forms as one 'forms' line"""
+    head, field = base_key.rsplit('/texts.', 1)
+    get = lambda case: entries.get('%s/texts.%s.%s' % (head, case, field), {}).get('uk', '')
+    sg = [get(c) for c in CASES_SG]
+    pl = [get(c + 'Plural') for c in CASES_SG]
+    return '' if not any(sg + pl) else '; '.join(sg) + ' | ' + '; '.join(pl)
+
+
+def name_group(base_key, source):
+    """every key a name line stands for: the name, its forms, its plural"""
+    head, field = base_key.rsplit('/texts.', 1)
+    keys = {base_key, '%s/texts.plural.%s' % (head, field)}
+    keys |= {k for k, s in source.items() if s.get('base') == base_key}
+    return {k for k in keys if k in source}
+
+
 def edges(en, text):
     """carry the English's leading/trailing whitespace over: it is layout
     (" / Day", "You will lose : "), and editors tend to eat trailing spaces"""

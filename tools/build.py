@@ -25,13 +25,36 @@ Usage:
                                        same pipeline and compare (self-test)
     python tools/build.py --install    build, then copy res.compressed1.pak into
                                        the game (pick "Русский" in the options)
+    python tools/build.py --proofread  ship only the rows marked in
+                                       translation/proofreading.csv (tools/proof.py)
+    python tools/build.py --release 0.1
+                                       --proofread, then pack the pak and the
+                                       install note into local/release/*.zip
     python tools/build.py --uninstall  remove it from the game again
 """
-import collections, datetime, os, shutil, sys
-import d4x, check, fonts
+import collections, datetime, os, shutil, sys, zipfile
+import d4x, check, fonts, proof
 
 PATCH = 'res.compressed1.pak'
 MARKER = 'ua-localization.txt'                   # tells our patch from anyone else's
+
+README_TXT = '''Dune: Spice Wars — українська локалізація, версія {version}
+Для гри версії {game}. Перекладено {n} рядків ({pct:.0f}%), решта поки англійською.
+
+ВСТАНОВЛЕННЯ
+1. Скопіюйте res.compressed1.pak у папку гри, туди, де лежить res.compressed.pak.
+   Steam: ПКМ на грі → Керувати → Переглянути локальні файли.
+2. У налаштуваннях гри оберіть мову «Русский»: переклад займає цей слот.
+
+ВИДАЛЕННЯ
+Видаліть res.compressed1.pak з папки гри. Перевірка цілісності файлів у Steam
+його не прибирає.
+
+Після оновлення гри змінені рядки показуються англійською, доки не вийде
+нова версія перекладу.
+
+https://github.com/Iskamele/Ukrainify-Dune-Space-Wars
+'''
 
 
 def arg(name, default=None):
@@ -142,6 +165,14 @@ def main():
         sys.exit(0 if self_test(game, os.path.join(d4x.LOCAL, 'selftest')) else 1)
 
     entries = d4x.load_translation()
+    release = arg('--release')
+    if release or '--proofread' in sys.argv:
+        source = d4x.load_source()
+        keys = proof.proofread_keys(source, entries)
+        entries = {k: e for k, e in entries.items() if k in keys}
+        print('proofread only: %d lines marked in %s' % (len(entries), os.path.basename(proof.PATH)))
+        for t, n in proof.dangling(keys, source).most_common(10):
+            print('warning  [%s] is not proofread: %d shipped lines show it in English' % (t, n))
     texts, export, skipped, total, files = build(game, entries, out_dir)
     print('shipped  %d texts + %d export lines  (%d of %d strings, %.1f%%)'
           % (len(texts), len(export), len(texts) + len(export), total,
@@ -158,6 +189,16 @@ def main():
     with open(os.path.join(out_dir, PATCH), 'wb') as f:
         f.write(pak)
     print('written  %s  (%.1f MB)' % (os.path.relpath(os.path.join(out_dir, PATCH), d4x.ROOT), len(pak) / 1e6))
+
+    if release:
+        shipped = len(texts) + len(export)
+        note = README_TXT.format(version=release, game=game.version, n=shipped, pct=100.0 * shipped / total)
+        path = os.path.join(d4x.LOCAL, 'release', 'Dune-Spice-Wars-UA-%s.zip' % release)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as z:
+            z.writestr(PATCH, pak)
+            z.writestr('Встановлення.txt', '﻿' + note.replace('\n', '\r\n'))
+        print('release  %s  (%.1f MB)' % (os.path.relpath(path, d4x.ROOT), os.path.getsize(path) / 1e6))
 
     if '--install' in sys.argv:
         if os.path.isfile(target) and not ours(target):
