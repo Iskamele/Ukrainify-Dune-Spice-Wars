@@ -1,0 +1,75 @@
+This repository contains the code only. The translation is kept separately and
+reaches players only inside release builds. Each kind of material has its own
+terms.
+
+
+1. CODE  (tools/)
+   MIT License
+
+   Copyright (c) 2026 Oleksandr Novikov
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+
+2. TRANSLATION AND GLOSSARY  (not in this repository; shipped only in releases)
+   Copyright (c) 2026 Oleksandr Novikov. All rights reserved.
+
+   You may download a release from the official source below and install it
+   on your own copy of the game. Anything else needs the author's written
+   permission, including:
+
+   - uploading the release, or any file from it, anywhere else: websites,
+     launchers, catalogues, collections, mod packs;
+   - using the translation, in whole or in part, as the basis for another
+     translation, port or project;
+   - any commercial use.
+
+   Official source: https://github.com/Iskamele/Ukrainianizer-Dune-Space-Wars/releases
+   To ask for permission, open an issue in this repository.
+
+   These terms cover the author's own work only. Terms taken from the
+   Ukrainian edition of Frank Herbert's "Dune" (KSD) are used for consistency
+   and remain the publisher's; the game's own text remains its owners'.
+
+   Українською. Переклад і глосарій — © 2026 Oleksandr Novikov, усі права
+   захищено. Ви можете завантажити збірку з офіційного джерела (Releases цього
+   репозиторію) і встановити її на власну копію гри. Усе інше — лише з
+   письмової згоди автора, зокрема: розміщення збірки чи будь-якого її файлу
+   деінде (сайти, лаунчери, каталоги, збірки, модпаки); використання перекладу
+   повністю чи частково як основи для іншого перекладу, порту чи проєкту;
+   будь-яке комерційне використання. Запит на дозвіл — через Issues цього
+   репозиторію. Ці умови стосуються лише власної роботи автора: терміни з
+   українського видання «Дюни» (КСД) належать видавцеві, текст гри — її
+   власникам.
+
+
+3. FONTS
+   No font files are included. The letters Ї ї Є є Ґ ґ are added at build time
+   to the fonts already installed with the game, on the user's own machine.
+
+
+NOT INCLUDED
+
+This repository contains no files from the game. The build reads a copy you
+already own and writes the patch next to it; it ships nothing of Shiro Games'
+or Funcom's work.
+
+Dune: Spice Wars is © Shiro Games, published by Funcom. Dune is © Herbert
+Properties LLC. This project is an unofficial community translation and is not
+affiliated with or endorsed by any of them.

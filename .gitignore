@@ -1,0 +1,31 @@
+# --- game text and game-derived files: never commit -------------------------
+# local/ holds what tools/extract.py and tools/build.py pull out of the game
+# (English, the shipped Russian, built XML, review sheets, patched fonts).
+# It belongs to Shiro Games; the repository keeps only the tools.
+local/
+*.pak
+*.xlsx
+
+# --- translation: kept in a separate private repository ---------------------
+# translation/ links to ../Ukrainianizer-Private/dune-spice-wars (the texts and
+# the glossary). It reaches users only inside release builds; see LICENSE.
+/translation
+
+# --- third-party text --------------------------------------------------------
+# glossary: the glossary appendix of the Ukrainian edition of "Dune" (KSD),
+# kept locally as the terminology reference. It is the publisher's text.
+/glossary
+/glossary.txt
+
+# --- reverse-engineering scratch ---------------------------------------------
+# One-off scripts used to map the game's formats; the findings live in the
+# README and in tools/.
+research/
+
+# --- tooling -----------------------------------------------------------------
+.idea/
+*.iml
+__pycache__/
+*.pyc
+.venv/
+venv/
