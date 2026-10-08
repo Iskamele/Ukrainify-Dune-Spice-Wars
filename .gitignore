@@ -7,7 +7,7 @@ local/
 *.xlsx
 
 # --- translation: kept in a separate private repository ---------------------
-# translation/ links to ../Ukrainianizer-Private/dune-spice-wars (the texts and
+# translation/ links to ../Ukrainify-Private/dune-spice-wars (the texts and
 # the glossary). It reaches users only inside release builds; see LICENSE.
 /translation
 
