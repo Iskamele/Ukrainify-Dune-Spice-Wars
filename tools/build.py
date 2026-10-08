@@ -53,7 +53,7 @@ README_TXT = '''Dune: Spice Wars — українська локалізація
 Після оновлення гри змінені рядки показуються англійською, доки не вийде
 нова версія перекладу.
 
-https://github.com/Iskamele/Ukrainify-Dune-Space-Wars
+https://github.com/Iskamele/Ukrainify-Dune-Spice-Wars
 '''
 
 
