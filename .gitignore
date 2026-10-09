@@ -1,6 +1,6 @@
 # --- game text and game-derived files: never commit -------------------------
 # local/ holds what tools/extract.py and tools/build.py pull out of the game
-# (English, the shipped Russian, built XML, review sheets, patched fonts).
+# (the game's English, built XML, review sheets, patched fonts).
 # It belongs to Shiro Games; the repository keeps only the tools.
 local/
 *.pak

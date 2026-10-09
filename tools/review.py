@@ -2,8 +2,8 @@
 """Review the translation in Excel, then bring the edits back.
 
 Export writes local/review/<name>.xlsx (game text inside, so it stays local):
-  Тексти   key | EN | RU | UA                       — edit UA
-  Назви    key | EN | RU | UA | Відмінки             — edit the name, or the
+  Тексти   key | EN | UA                            — edit UA
+  Назви    key | EN | UA | Відмінки                  — edit the name, or the
            cases as "Н; Р; Д; З; О; М | Н; Р; Д; З; О; М" (singular | plural)
 
 Import reads such a file back and merges every changed UA cell into
@@ -38,8 +38,8 @@ def export(name, prefixes, everything=False):
     texts = wb.active
     texts.title = 'Тексти'
     names = wb.create_sheet('Назви')
-    texts.append(['key', 'EN', 'RU', 'UA'])
-    names.append(['key', 'EN', 'RU', 'UA', 'Відмінки: Н; Р; Д; З; О; М | множина'])
+    texts.append(['key', 'EN', 'UA'])
+    names.append(['key', 'EN', 'UA', 'Відмінки: Н; Р; Д; З; О; М | множина'])
     n_t = n_n = 0
     for key, s in source.items():
         if not key.startswith(tuple(prefixes)) or s.get('base') or plural_of(key) in declined:
@@ -48,18 +48,18 @@ def export(name, prefixes, everything=False):
         if not uk and not everything:
             continue
         if key in declined:
-            names.append([key, s['en'], s['ru'], uk, forms_of(key, entries)])
+            names.append([key, s['en'], uk, forms_of(key, entries)])
             n_n += 1
         else:
-            texts.append([key, s['en'], s['ru'], uk])
+            texts.append([key, s['en'], uk])
             n_t += 1
-    for ws, widths in ((texts, (34, 60, 60, 60)), (names, (34, 26, 26, 26, 110))):
+    for ws, widths in ((texts, (34, 70, 70)), (names, (34, 30, 30, 110))):
         for i, w in enumerate(widths):
             ws.column_dimensions[chr(65 + i)].width = w
         for row in ws.iter_rows(min_row=2):
             for c in row:
                 c.alignment = Alignment(wrap_text=True, vertical='top')
-            for c in row[3:]:
+            for c in row[2:]:
                 c.fill = EDIT
         for c in ws[1]:
             c.font = Font(bold=True)
@@ -74,12 +74,20 @@ def import_(path):
     source, entries = d4x.load_source(), d4x.load_translation()
     wb = openpyxl.load_workbook(path)
     changed = {}
-    for row in wb['Тексти'].iter_rows(min_row=2, values_only=True):
-        key, uk = row[0], row[3] or ''
+    # columns are found by their header, so sheets written by older versions
+    # of this tool (with an extra reference column) still import
+    col = lambda ws, head: [str(c.value or '') for c in ws[1]].index(head)
+    ws = wb['Тексти']
+    ua = col(ws, 'UA')
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        key, uk = row[0], row[ua] or ''
         if key in source and uk != entries.get(key, {}).get('uk', ''):
             changed[key] = uk
-    for row in wb['Назви'].iter_rows(min_row=2, values_only=True):
-        key, uk, forms = row[0], row[3] or '', row[4] or ''
+    ws = wb['Назви']
+    ua = col(ws, 'UA')
+    fc = next(i for i, c in enumerate(ws[1]) if str(c.value or '').startswith('Відмінки'))
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        key, uk, forms = row[0], row[ua] or '', row[fc] or ''
         if key not in source:
             continue
         if forms and forms != forms_of(key, entries):

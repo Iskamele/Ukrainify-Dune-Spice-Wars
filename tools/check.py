@@ -25,8 +25,9 @@ Warnings:
 
 Usage:
     python tools/check.py                 check translation/
-    python tools/check.py --ru            run the same rules over the shipped
-                                          Russian (calibrates the checker)
+    python tools/check.py --shipped       run the same rules over the game's own
+                                          translation in our slot (calibrates
+                                          the checker)
     python tools/check.py -v              list every warning too
     python tools/check.py --only markup   list one kind
 """
@@ -186,9 +187,11 @@ def main():
     with open(os.path.join(d4x.LOCAL, 'source', 'game.json'), encoding='utf-8') as f:
         charset = set(json.load(f)['charset'])
 
-    if '--ru' in args:
-        entries = {k: {'uk': s['ru'], 'src': d4x.src_hash(s['en'])} for k, s in source.items() if s['ru']}
-        label = 'shipped Russian'
+    if '--shipped' in args:
+        game = d4x.Game()
+        shipped = dict(d4x.parse_texts(game.lang_file('texts')), **d4x.parse_export(game.lang_file('export')))
+        entries = {k: {'uk': v, 'src': d4x.src_hash(source[k]['en'])} for k, v in shipped.items() if v and k in source}
+        label = 'shipped %s' % d4x.LANG
     else:
         entries = d4x.load_translation()
         label = 'translation/'
@@ -211,7 +214,7 @@ def main():
         print()
         for kind, key, msg in shown:
             print('%-7s %s\n        %s' % (kind, key, msg))
-    sys.exit(1 if any(k in ERRORS for k in by_kind) and '--ru' not in args else 0)
+    sys.exit(1 if any(k in ERRORS for k in by_kind) and '--shipped' not in args else 0)
 
 
 if __name__ == '__main__':

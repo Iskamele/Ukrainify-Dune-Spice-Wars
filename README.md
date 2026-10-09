@@ -8,7 +8,7 @@
 
 ## Стан перекладу
 
-Перекладено **5 713 з 18 204 рядків (31%)**. Неперекладене гра показує англійською — ніколи російською.
+Перекладено **5 713 з 18 204 рядків (31%)**. Неперекладене гра показує англійською.
 
 | Розділ | Стан |
 |---|---|
@@ -21,7 +21,7 @@
 | Риси, здібності, розробки, спорядження | — |
 | Навчання, місії, події, репліки персонажів | — |
 
-Переклад іде з англійського оригіналу. Російська версія гри — лише орієнтир щодо довжини рядків; кілька її помилок (загублені імена, неправильні терміни, символи без гліфів) свідомо не перенесено.
+Переклад іде з англійського оригіналу.
 
 ## Встановлення
 
@@ -35,9 +35,9 @@ py tools/build.py --uninstall
 
 Або просто видаліть `res.compressed1.pak` з папки гри. Оригінальні файли гри не змінюються ні за встановлення, ні за видалення. Перевірка цілісності в Steam цей файл не прибирає — його треба видалити самому.
 
-## Чому слот російської
+## Чому слот французької
 
-Список мов вкомпільований у код гри (`hlboot.dat`), і гра показує лише мови з цього списку. Додати окремий пункт «Українська» можна тільки патчем виконуваного коду, тому переклад займає слот російської мови. У меню вибору мови він підписаний «Русский».
+Список мов вкомпільований у код гри (`hlboot.dat`), і гра показує лише мови з цього списку. Додати окремий пункт «Українська» можна тільки патчем виконуваного коду, а англійська взагалі не завантажує файлів перекладу. Тому переклад займає слот французької мови: код гри не робить для неї жодних винятків, а стилі інтерфейсу дають їй ширші кнопки й панелі під довший текст. У меню вибору мови він підписаний «Français». Решта мов гри не використовуються й не змінюються.
 
 ## Відомі обмеження
 
@@ -97,7 +97,7 @@ py tools/build.py --uninstall
 | `translation/` (не в репозиторії) | переклад (ключ, відбиток англійського оригіналу, український текст) і глосарій; зберігаються окремо |
 | `tools/build.py` | збирає патч (тексти + шрифти) і встановлює чи видаляє його |
 | `tools/check.py` | перевіряє переклад |
-| `tools/extract.py` | витягає англійський і російський текст гри в `local/` для роботи |
+| `tools/extract.py` | витягає англійський текст гри в `local/` для роботи |
 | `tools/merge.py` | вливає нову порцію перекладу |
 | `tools/review.py` | вивантажує переклад у таблицю Excel для вичитки й забирає правки назад |
 | `tools/fonts.py`, `tools/bfnt.py`, `tools/preview.py` | шрифти: додавання літер, формат BFNT, попередній перегляд |
@@ -145,7 +145,7 @@ Dune: Spice Wars © Shiro Games, видавець Funcom. Dune © Herbert Proper
 
 An unofficial Ukrainian translation. Not affiliated with Shiro Games or Funcom.
 
-**Status:** 5,713 of 18,204 strings (31%): the whole UI, resources, factions, unit names with every grammatical case, and the fonts (Ї, Є, Ґ added to all 8 game fonts). Buildings and regions come next. Anything untranslated shows in English, never Russian.
+**Status:** 5,713 of 18,204 strings (31%): the whole UI, resources, factions, unit names with every grammatical case, and the fonts (Ї, Є, Ґ added to all 8 game fonts). Buildings and regions come next. Anything untranslated shows in English.
 
 ## Installing
 
@@ -153,9 +153,9 @@ No release yet: the translation is in progress. Builds will be published on the 
 
 To remove a build: `py tools/build.py --uninstall`, or delete `res.compressed1.pak` from the game folder (Steam's integrity check leaves it in place).
 
-## Why the Russian slot
+## Why the French slot
 
-The language list is compiled into the game code (`hlboot.dat`); a new entry would need a bytecode patch. The translation therefore occupies the Russian slot, which the language picker still labels "Русский".
+The language list is compiled into the game code (`hlboot.dat`); a new entry would need a bytecode patch, and English loads no translation files at all. The translation therefore occupies the French slot: the code has no special cases for French, and the UI styles give it wider buttons and panels for longer text. The language picker labels it "Français". No other language of the game is used or changed.
 
 ## How it works
 

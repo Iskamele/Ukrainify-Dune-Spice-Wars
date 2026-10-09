@@ -2,9 +2,9 @@
 """Assemble the game's language files from translation/ and the installed game.
 
 Writes (default local/build/):
-  lang/texts_ru.xml            Ukrainian UI strings
-  lang/export_ru.xml           Ukrainian data.cdb fields
-  lang/old/export_ru_old.xml   the English each shipped line was translated
+  lang/texts_fr.xml            Ukrainian UI strings (the French slot, see d4x.LANG)
+  lang/export_fr.xml           Ukrainian data.cdb fields
+  lang/old/export_fr_old.xml   the English each shipped line was translated
                                from, i.e. the game's current English — cdb.Lang
                                skips a line whose reference differs from data.cdb
   res.compressed1.pak          the three files above plus the UI fonts with
@@ -14,17 +14,15 @@ Writes (default local/build/):
 
 A line ships only when it is non-empty, passes every check.py error rule and
 its English has not changed since it was translated (src hash). Everything
-else falls back to the game's English, never to the Russian.
-
-Everything is generated from the user's own game files plus translation/, so
-the output never has to be distributed.
+else falls back to the game's English. No other language of the game is
+read or changed: the patch only replaces the slot's files.
 
 Usage:
     python tools/build.py [--game <D4X folder>] [--out <dir>]
-    python tools/build.py --ru         rebuild the shipped Russian through the
-                                       same pipeline and compare (self-test)
+    python tools/build.py --selftest   rebuild the slot's shipped translation
+                                       through the same pipeline and compare
     python tools/build.py --install    build, then copy res.compressed1.pak into
-                                       the game (pick "Русский" in the options)
+                                       the game (pick "Français" in the options)
     python tools/build.py --proofread  ship only the rows marked in
                                        translation/proofreading.csv (tools/proof.py)
     python tools/build.py --release 0.1
@@ -44,7 +42,7 @@ README_TXT = '''Dune: Spice Wars — українська локалізація
 ВСТАНОВЛЕННЯ
 1. Скопіюйте res.compressed1.pak у папку гри, туди, де лежить res.compressed.pak.
    Steam: ПКМ на грі → Керувати → Переглянути локальні файли.
-2. У налаштуваннях гри оберіть мову «Русский»: переклад займає цей слот.
+2. У налаштуваннях гри оберіть мову «Français»: переклад займає цей слот.
 
 ВИДАЛЕННЯ
 Видаліть res.compressed1.pak з папки гри. Перевірка цілісності файлів у Steam
@@ -93,11 +91,9 @@ def build(game, entries, out_dir):
     export = dict(sorted(export.items(), key=lambda kv: order[kv[0]]))
     ref = {k: ref[k] for k in export}
 
-    ru_texts = game.lang_file('texts')
-    ru_export = game.lang_file('export')
-    files = {
-        'lang/texts_%s.xml' % d4x.LANG: d4x.emit_texts(texts, d4x.xml_attrs(ru_texts)),
-        'lang/export_%s.xml' % d4x.LANG: d4x.emit_export(export, d4x.xml_attrs(ru_export)),
+    files = {   # the root attributes are copied from the slot's own files
+        'lang/texts_%s.xml' % d4x.LANG: d4x.emit_texts(texts, d4x.xml_attrs(game.lang_file('texts'))),
+        'lang/export_%s.xml' % d4x.LANG: d4x.emit_export(export, d4x.xml_attrs(game.lang_file('export'))),
         'lang/old/export_%s_old.xml' % d4x.LANG: d4x.emit_export(ref, d4x.xml_attrs(game.lang_file('ref'))),
     }
     for name, body in files.items():
@@ -109,7 +105,7 @@ def build(game, entries, out_dir):
 
 
 def self_test(game, out_dir):
-    """Push the shipped Russian through build() and read it back: every
+    """Push the slot's shipped translation through build() and read it back: every
     string must survive unchanged, so the emitters are trustworthy."""
     want_t = {k: v for k, v in d4x.parse_texts(game.lang_file('texts')).items() if v}
     want_e = {k: v for k, v in d4x.parse_export(game.lang_file('export')).items() if v}
@@ -117,8 +113,8 @@ def self_test(game, out_dir):
     entries = {k: {'uk': v, 'src': d4x.src_hash(src[k]['en'])}
                for k, v in list(want_t.items()) + list(want_e.items()) if k in src}
     texts, export, skipped, _, _ = build(game, entries, out_dir)
-    got_t = d4x.parse_texts(open(os.path.join(out_dir, 'lang', 'texts_ru.xml'), encoding='utf-8').read())
-    got_e = d4x.parse_export(open(os.path.join(out_dir, 'lang', 'export_ru.xml'), encoding='utf-8').read())
+    got_t = d4x.parse_texts(open(os.path.join(out_dir, 'lang', 'texts_%s.xml' % d4x.LANG), encoding='utf-8').read())
+    got_e = d4x.parse_export(open(os.path.join(out_dir, 'lang', 'export_%s.xml' % d4x.LANG), encoding='utf-8').read())
     bad = [k for k in texts if got_t.get(k) != want_t[k]] + [k for k in export if got_e.get(k) != want_e[k]]
     print('self-test: %d texts + %d export lines rebuilt, %d differ after the round trip'
           % (len(texts), len(export), len(bad)))
@@ -161,7 +157,7 @@ def main():
         remove_loose(game)
         return
 
-    if '--ru' in sys.argv:
+    if '--selftest' in sys.argv:
         sys.exit(0 if self_test(game, os.path.join(d4x.LOCAL, 'selftest')) else 1)
 
     entries = d4x.load_translation()
@@ -205,7 +201,7 @@ def main():
             sys.exit('%s exists and is not ours — not overwriting it' % target)
         shutil.copyfile(os.path.join(out_dir, PATCH), target)
         remove_loose(game)
-        print('copied   %s  (in the game pick "Русский")' % target)
+        print('copied   %s  (in the game pick "Français")' % target)
 
 
 if __name__ == '__main__':

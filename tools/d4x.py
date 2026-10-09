@@ -26,7 +26,11 @@ import xml.etree.ElementTree as ET
 STEAM_DEFAULT = r'C:\Program Files (x86)\Steam'
 APP_DIR = 'D4X'
 PAK_NAME = 'res.compressed.pak'
-LANG = 'ru'                     # the slot the Ukrainian translation occupies
+# The language slot the Ukrainian occupies. The list of languages is compiled
+# into the game code; English loads no translation files at all, so a slot of
+# another shipped language is used. French: no code special-cases it, and its
+# CSS widens a few buttons and panels for longer text.
+LANG = 'fr'
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TRANSLATION = os.path.join(ROOT, 'translation')
@@ -420,27 +424,25 @@ def font_charset(game):
 
 
 def game_strings(game):
-    """-> {key: {'en', 'ru', 'base'?}} in the game's own order: everything the
+    """-> {key: {'en', 'base'?}} in the game's own order: everything the
     Ukrainian has to cover. The one definition extract, check and build share.
+    Only the English is read.
 
-    The schema allows declension on every name, but only names the text
-    actually inserts need it — the Russian declines exactly those, so its
-    choice is the list. Buttons such as "Cancel" are left alone."""
-    ru_texts = parse_texts(game.lang_file('texts'))
-    ru_export = parse_export(game.lang_file('export'))
+    Every name whose sheet has case columns gets all twelve forms: a link can
+    reach any of them, also through placeholders such as [::target::]g. A
+    name nothing declines (a button label) just repeats its nominative."""
     out = {}
     for k, en in parse_texts(game.pak.text('texts.xml')).items():
         if en:
-            out[k] = {'en': en, 'ru': ru_texts.get(k, '')}
+            out[k] = {'en': en}
     src, decl = cdb_sources(game.cdb)
     forms = {}
     for dk, base in decl.items():
         forms.setdefault(base, []).append(dk)
     for k, en in src.items():
-        out[k] = {'en': en, 'ru': ru_export.get(k, '')}
+        out[k] = {'en': en}
         for dk in forms.get(k, []):                 # forms right after their name
-            if dk in ru_export:
-                out[dk] = {'en': en, 'ru': ru_export[dk], 'base': k}
+            out[dk] = {'en': en, 'base': k}
     return out
 
 
@@ -523,7 +525,7 @@ def save_translation(entries, source):
 
 
 def load_source():
-    """-> {key: {'en', 'ru', 'base'}} from local/source (written by extract.py)"""
+    """-> {key: {'en', 'base'}} from local/source (written by extract.py)"""
     path = os.path.join(LOCAL, 'source', 'strings.tsv')
     if not os.path.isfile(path):
         sys.exit('no local/source/strings.tsv — run tools/extract.py first')
