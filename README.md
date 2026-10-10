@@ -2,24 +2,24 @@
 
 Неофіційний переклад українською. Не пов'язаний із Shiro Games чи Funcom.
 
-![гра](https://img.shields.io/badge/гра-Steam-blue) ![статус](https://img.shields.io/badge/переклад-31%25-orange) ![версія](https://img.shields.io/badge/версія_гри-2.2.7-lightgrey)
+![гра](https://img.shields.io/badge/гра-Steam-blue) ![переклад](https://img.shields.io/badge/переклад-51%25-orange) ![вичитка](https://img.shields.io/badge/вичитано_вручну-%3C1%25-blue) ![версія](https://img.shields.io/badge/версія_гри-2.2.7-lightgrey)
 
 [Dune: Spice Wars у Steam](https://store.steampowered.com/app/1605220/Dune_Spice_Wars/)
 
 ## Стан перекладу
 
-Перекладено **5 713 з 18 204 рядків (31%)**. Неперекладене гра показує англійською.
+Перекладено **9 714 з 18 972 рядків (51%)**, вручну вичитано **5 (<1%)**. До збірки потрапляють лише вичитані рядки, решту гра показує англійською.
 
-| Розділ | Стан |
-|---|---|
-| Інтерфейс: меню, підказки, Ландсраад, ринок ДАПТ, шпигунство, дипломатія, торгівля, «Завоювання», налаштування | готово |
-| Ресурси: назви, усі відмінки, описи | готово |
-| Фракції: назви, відмінки, описи | готово |
-| Бойові одиниці: назви з усіма відмінками й множиною | готово, описи — ні |
-| Шрифти: літери Ї, Є, Ґ у всіх 8 шрифтах гри | готово |
-| Будівлі, споруди, регіони | далі в черзі |
-| Риси, здібності, розробки, спорядження | — |
-| Навчання, місії, події, репліки персонажів | — |
+| Розділ | Переклад | Вичитка |
+|---|---|---|
+| Інтерфейс: меню, підказки, Ландсраад, ринок ДАПТ, шпигунство, дипломатія, торгівля, «Завоювання», налаштування | готово | почато |
+| Ресурси: назви, усі відмінки, описи | готово | — |
+| Фракції: назви, відмінки, описи | готово | — |
+| Бойові одиниці: назви з усіма відмінками й множиною | готово, описи — ні | — |
+| Будівлі, споруди, регіони, території: назви з усіма відмінками, описи, бонуси | готово | — |
+| Шрифти: літери Ї, Є, Ґ у всіх 8 шрифтах гри | готово | — |
+| Риси, здібності, розробки, спорядження | далі в черзі | — |
+| Навчання, місії, події, репліки персонажів | — | — |
 
 Переклад іде з англійського оригіналу.
 
@@ -100,6 +100,8 @@ py tools/build.py --uninstall
 | `tools/extract.py` | витягає англійський текст гри в `local/` для роботи |
 | `tools/merge.py` | вливає нову порцію перекладу |
 | `tools/review.py` | вивантажує переклад у таблицю Excel для вичитки й забирає правки назад |
+| `tools/proof.py` | веде таблицю ручної вичитки (`translation/proofreading.csv`): правки й позначки «вичитано» |
+| `tools/status.py` | рахує поступ перекладу й вичитки та оновлює значки в цьому README |
 | `tools/fonts.py`, `tools/bfnt.py`, `tools/preview.py` | шрифти: додавання літер, формат BFNT, попередній перегляд |
 | `tools/d4x.py` | спільна бібліотека: формат PAK, мовні XML, обхід `data.cdb` |
 
@@ -145,7 +147,9 @@ Dune: Spice Wars © Shiro Games, видавець Funcom. Dune © Herbert Proper
 
 An unofficial Ukrainian translation. Not affiliated with Shiro Games or Funcom.
 
-**Status:** 5,713 of 18,204 strings (31%): the whole UI, resources, factions, unit names with every grammatical case, and the fonts (Ї, Є, Ґ added to all 8 game fonts). Buildings and regions come next. Anything untranslated shows in English.
+**Status:** 9,714 of 18,972 strings translated (51%), 5 proofread by hand (<1%). Releases ship proofread lines only; everything else shows in English.
+
+Translated so far: the whole UI, resources, factions, unit names with every grammatical case, buildings, structures, regions and territories, and the fonts (Ї, Є, Ґ added to all 8 game fonts). Traits, abilities, developments and equipment come next.
 
 ## Installing
 
