@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Progress figures for the README: translated, and proofread by hand.
+"""Progress figures for the README: translated, and edited by hand.
 
 Translated counts every string that has a Ukrainian line (check.py's
-figure). Proofread counts the strings behind the rows marked in
+figure). Edited counts the strings behind the rows checked in
 translation/proofreading.csv (tools/proof.py): the ones a release ships.
 
 --readme rewrites, in README.md, the two badges after the game badge and the
@@ -40,17 +40,17 @@ def update_readme(tr, pr, total):
     text = open(README, encoding='utf-8').read()
     ua = lambda n: '{:,}'.format(n).replace(',', ' ')
     badges = (badge('переклад', 'переклад', tr, total, 'orange') + ' ' +
-              badge('вичитка', 'вичитано_вручну', pr, total, 'blue'))
+              badge('редактура', 'редактура', pr, total, 'blue'))
     rules = [
         (r'!\[(?:статус|переклад)\]\(https://img\.shields\.io/badge/переклад-[^)]*\)'
-         r'(?: !\[вичитка\]\(https://img\.shields\.io/badge/вичитано_вручну-[^)]*\))?', badges),
+         r'(?: !\[(?:вичитка|редактура)\]\(https://img\.shields\.io/badge/(?:вичитано_вручну|редактура)-[^)]*\))?', badges),
         (r'(?m)^Перекладено \*\*.*$',
-         'Перекладено **%s з %s рядків (%s)**, вручну вичитано **%s (%s)**. '
-         'До збірки потрапляють лише вичитані рядки, решту гра показує англійською.'
+         'Перекладено **%s з %s рядків (%s)**, відредаговано вручну **%s (%s)**. '
+         'До збірки потрапляють лише відредаговані рядки, решту гра показує англійською.'
          % (ua(tr), ua(total), pct(tr, total), ua(pr), pct(pr, total))),
         (r'(?m)^\*\*Status:\*\* .*$',
-         '**Status:** {:,} of {:,} strings translated ({}), {:,} proofread by hand ({}). '
-         'Releases ship proofread lines only; everything else shows in English.'
+         '**Status:** {:,} of {:,} strings translated ({}), {:,} edited by hand ({}). '
+         'Releases ship edited lines only; everything else shows in English.'
          .format(tr, total, pct(tr, total), pr, pct(pr, total))),
     ]
     for pattern, new in rules:
@@ -65,7 +65,7 @@ def main():
     d4x.configure_stdout()
     tr, pr, total = figures()
     print('translated %6d of %d  (%s)' % (tr, total, pct(tr, total)))
-    print('proofread  %6d of %d  (%s)' % (pr, total, pct(pr, total)))
+    print('edited     %6d of %d  (%s)' % (pr, total, pct(pr, total)))
     if '--readme' in sys.argv:
         update_readme(tr, pr, total)
         print('updated  README.md')

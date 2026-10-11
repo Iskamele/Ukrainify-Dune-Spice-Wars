@@ -2,15 +2,15 @@
 
 Неофіційний переклад українською. Не пов'язаний із Shiro Games чи Funcom.
 
-![гра](https://img.shields.io/badge/гра-Steam-blue) ![переклад](https://img.shields.io/badge/переклад-51%25-orange) ![вичитка](https://img.shields.io/badge/вичитано_вручну-%3C1%25-blue) ![версія](https://img.shields.io/badge/версія_гри-2.2.7-lightgrey)
+![гра](https://img.shields.io/badge/гра-Steam-blue) ![переклад](https://img.shields.io/badge/переклад-51%25-orange) ![редактура](https://img.shields.io/badge/редактура-1%25-blue) ![версія](https://img.shields.io/badge/версія_гри-2.2.7-lightgrey)
 
 [Dune: Spice Wars у Steam](https://store.steampowered.com/app/1605220/Dune_Spice_Wars/)
 
 ## Стан перекладу
 
-Перекладено **9 714 з 18 972 рядків (51%)**, вручну вичитано **5 (<1%)**. До збірки потрапляють лише вичитані рядки, решту гра показує англійською.
+Перекладено **9 714 з 18 972 рядків (51%)**, відредаговано вручну **315 (1%)**. До збірки потрапляють лише відредаговані рядки, решту гра показує англійською.
 
-| Розділ | Переклад | Вичитка |
+| Розділ | Переклад | Редактура |
 |---|---|---|
 | Інтерфейс: меню, підказки, Ландсраад, ринок ДАПТ, шпигунство, дипломатія, торгівля, «Завоювання», налаштування | готово | почато |
 | Ресурси: назви, усі відмінки, описи | готово | — |
@@ -99,9 +99,9 @@ py tools/build.py --uninstall
 | `tools/check.py` | перевіряє переклад |
 | `tools/extract.py` | витягає англійський текст гри в `local/` для роботи |
 | `tools/merge.py` | вливає нову порцію перекладу |
-| `tools/review.py` | вивантажує переклад у таблицю Excel для вичитки й забирає правки назад |
-| `tools/proof.py` | веде таблицю ручної вичитки (`translation/proofreading.csv`): правки й позначки «вичитано» |
-| `tools/status.py` | рахує поступ перекладу й вичитки та оновлює значки в цьому README |
+| `tools/review.py` | вивантажує переклад у таблицю Excel для редагування й забирає правки назад |
+| `tools/proof.py` | веде таблицю ручної редактури (`translation/proofreading.csv`): правки й позначки |
+| `tools/status.py` | рахує поступ перекладу й редактури та оновлює значки в цьому README |
 | `tools/fonts.py`, `tools/bfnt.py`, `tools/preview.py` | шрифти: додавання літер, формат BFNT, попередній перегляд |
 | `tools/d4x.py` | спільна бібліотека: формат PAK, мовні XML, обхід `data.cdb` |
 
@@ -111,7 +111,7 @@ py tools/build.py --uninstall
 
 Зауваження до перекладу — через Issues: назва рядка або скриншот і як має бути.
 
-Хочете перекладати чи вичитувати — напишіть в Issues. Робочі файли перекладу не публікуються, доступ до них — за домовленістю. Надіслані правки входять до перекладу на умовах [LICENSE](LICENSE).
+Хочете перекладати чи редагувати — напишіть в Issues. Робочі файли перекладу не публікуються, доступ до них — за домовленістю. Надіслані правки входять до перекладу на умовах [LICENSE](LICENSE).
 
 З доступом до робочих файлів:
 
@@ -120,7 +120,7 @@ py tools/extract.py                     витягти тексти гри в lo
 py tools/merge.py <порція.tsv>          влити свої рядки в translation/
 py tools/check.py -v                    перевірити й побачити поступ
 py tools/build.py --install             зібрати й подивитися в грі
-py tools/review.py <назва> <префікс>    таблиця для вичитки (і --import для правок)
+py tools/review.py <назва> <префікс>    таблиця для редагування (і --import для правок)
 ```
 
 Порція — текстовий файл: ключ, табуляція, переклад. Назву з усіма відмінками задає один рядок:
@@ -147,7 +147,7 @@ Dune: Spice Wars © Shiro Games, видавець Funcom. Dune © Herbert Proper
 
 An unofficial Ukrainian translation. Not affiliated with Shiro Games or Funcom.
 
-**Status:** 9,714 of 18,972 strings translated (51%), 5 proofread by hand (<1%). Releases ship proofread lines only; everything else shows in English.
+**Status:** 9,714 of 18,972 strings translated (51%), 315 edited by hand (1%). Releases ship edited lines only; everything else shows in English.
 
 Translated so far: the whole UI, resources, factions, unit names with every grammatical case, buildings, structures, regions and territories, and the fonts (Ї, Є, Ґ added to all 8 game fonts). Traits, abilities, developments and equipment come next.
 

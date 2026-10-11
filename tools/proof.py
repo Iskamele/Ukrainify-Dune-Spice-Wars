@@ -10,7 +10,8 @@ one row:
   EN         the game's English
   UA         the translation: edit it in place
   відмінки   names only, "Н; Р; Д; З; О; М | Н; Р; Д; З; О; М": edit in place
-  вичитано   put anything here (✓, +) once the row is checked
+  вичитано   ✓ (or +) once the row is checked; ✗ or anything else flags it
+             for a fix: kept as written, and the row stays out of releases
   дата       filled in by the tool: the day the row was marked
   коментар   free notes, kept as they are
   відбиток   filled in by the tool: what the row said when it was written out
@@ -37,6 +38,8 @@ import d4x, merge
 
 PATH = os.path.join(d4x.TRANSLATION, 'proofreading.csv')
 HEAD = ['ключ', 'розділ', 'EN', 'UA', 'відмінки', 'вичитано', 'дата', 'коментар', 'відбиток']
+OK_MARKS = {'✓', '✔', '+', 'v', 'V', '1'}       # what counts as "checked"
+ok = lambda mark: mark.strip() in OK_MARKS
 # what Excel leaves in a cell it took for a formula
 EXCEL_ERROR = re.compile(r"^#(NAME\?|ИМЯ\?|ІМ'Я\?|VALUE!|ЗНАЧ!|REF!|ССЫЛКА!|ПОСИЛАННЯ!|N/A|Н/Д)")
 
@@ -108,7 +111,7 @@ def sync():
     before = lines(source, entries)
     sheet = read_sheet()
     today = datetime.date.today().isoformat()
-    edits, marks, notes = {}, {}, {}
+    edits, marks, notes, flags = {}, {}, {}, {}
     edited, conflicts, dropped, bad = [], [], [], []
 
     for key, r in sheet.items():
@@ -136,7 +139,9 @@ def sync():
                 new[key] = cur_ua                   # forms edited, the name itself was not
             edits.update(new)
             edited.append(key)
-        if r['вичитано'].strip():
+        if r['вичитано'].strip() and not ok(r['вичитано']):
+            flags[key] = r['вичитано'].strip()          # a request, not a check
+        elif r['вичитано'].strip():
             if user_changed or fingerprint(cur_ua, cur_forms) == r['відбиток']:
                 marks[key] = r['дата'] if (r['дата'] and not user_changed) else today
             else:
@@ -151,11 +156,11 @@ def sync():
     rows = []
     for key, (ua, forms) in after.items():
         rows.append({'ключ': key, 'розділ': section(key), 'EN': source[key]['en'], 'UA': ua, 'відмінки': forms,
-                     'вичитано': '✓' if key in marks else '', 'дата': marks.get(key, ''),
+                     'вичитано': '✓' if key in marks else flags.get(key, ''), 'дата': marks.get(key, ''),
                      'коментар': notes.get(key, ''), 'відбиток': fingerprint(ua, forms)})
     write_sheet(rows)
 
-    print('read     %d rows: %d edited, %d marked' % (len(sheet), len(edited), len(marks)))
+    print('read     %d rows: %d edited, %d checked, %d flagged for a fix' % (len(sheet), len(edited), len(marks), len(flags)))
     print('written  %s  (%d rows)' % (os.path.relpath(PATH, d4x.ROOT), len(rows)))
     for key, ua, forms in conflicts:
         print('CONFLICT %s — your CSV edit was kept; translation/ had:\n         %s' % (key, ua + (' || ' + forms if forms else '')))
@@ -177,7 +182,7 @@ def proofread_keys(source, entries):
     declined = {s['base'] for s in source.values() if s.get('base')}
     keys = set()
     for key, r in sheet.items():
-        if r['вичитано'].strip() and key in current and fingerprint(*current[key]) == r['відбиток']:
+        if ok(r['вичитано']) and key in current and fingerprint(*current[key]) == r['відбиток']:
             keys |= merge.name_group(key, source) if key in declined else {key}
     return keys
 
@@ -207,8 +212,9 @@ def status():
     keys = proofread_keys(source, entries)
     total = collections.Counter(section(k) for k in current)
     done = collections.Counter(section(k) for k, r in sheet.items()
-                               if r['вичитано'].strip() and k in current and fingerprint(*current[k]) == r['відбиток'])
-    days = collections.Counter(r['дата'] for r in sheet.values() if r['вичитано'].strip() and r['дата'])
+                               if ok(r['вичитано']) and k in current and fingerprint(*current[k]) == r['відбиток'])
+    days = collections.Counter(r['дата'] for r in sheet.values() if ok(r['вичитано']) and r['дата'])
+    flagged = [k for k, r in sheet.items() if r['вичитано'].strip() and not ok(r['вичитано'])]
     import check
     cov_total, _ = check.coverage(entries, source)
     print('proofread %d of %d rows; ships %d of %d strings (%.1f%% of the game)'
@@ -220,6 +226,10 @@ def status():
         print('by day:')
         for d in sorted(days):
             print('  %s  %d' % (d, days[d]))
+    if flagged:
+        print('flagged for a fix (%d):' % len(flagged))
+        for k in flagged:
+            print('  %s %s  %s' % (sheet[k]['вичитано'].strip(), k, sheet[k]['коментар']))
     gaps = dangling(keys, source)
     if gaps:
         print('proofread lines that link to names not proofread yet (they would show in English):')
