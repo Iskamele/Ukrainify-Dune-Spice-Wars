@@ -29,11 +29,18 @@ CSV wins and the other version is printed, so nothing is lost.
 
 tools/build.py --proofread ships the marked rows only.
 
+--web syncs, then opens a page in the browser that shows one row at a time:
+→ marks it ✓, ← marks it ✗ (a comment is required), ↓ writes a comment and
+waits for ← or →, ↑ goes back a row. Every decision is written to the CSV at
+once, so the page can be closed at any moment. Close the CSV in Excel first:
+Excel locks the file.
+
 Usage:
     python tools/proof.py            sync
     python tools/proof.py --status   progress by section and by day
+    python tools/proof.py --web      sync, then proofread in the browser
 """
-import collections, csv, datetime, io, os, re, sys
+import collections, csv, datetime, io, json, os, re, sys
 import d4x, merge
 
 PATH = os.path.join(d4x.TRANSLATION, 'proofreading.csv')
@@ -102,8 +109,14 @@ def write_sheet(rows, path=PATH):
     w.writerow(HEAD)
     for r in rows:
         w.writerow([d4x.esc(r[h]) if h in ('EN', 'UA', 'відмінки') else r[h] for h in HEAD])
-    with open(path, 'w', encoding='utf-8-sig', newline='') as f:
-        f.write(buf.getvalue())
+    tmp = path + '.tmp'                     # a failed write must not leave half a sheet
+    try:
+        with open(tmp, 'w', encoding='utf-8-sig', newline='') as f:
+            f.write(buf.getvalue())
+        os.replace(tmp, path)
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
 
 
 def sync():
@@ -237,10 +250,82 @@ def status():
             print('  [%s] in %d lines' % (t, n))
 
 
+def set_mark(key, mark, note):
+    """one decision from the page -> the CSV. The sheet is read again first, so
+    nothing written to it in the meantime is lost."""
+    sheet = read_sheet()
+    if key not in sheet:
+        raise KeyError(key)
+    r = sheet[key]
+    if not (ok(mark) and ok(r['вичитано'])):     # re-accepting keeps the first date
+        r['дата'] = datetime.date.today().isoformat() if ok(mark) else ''
+    r['вичитано'], r['коментар'] = mark, note
+    write_sheet(sheet.values())
+
+
+def web(port=8723):
+    import http.server, webbrowser
+    try:
+        sync()
+    except PermissionError:
+        sys.exit('proofreading.csv is open in another program (Excel?): close it and run again')
+    page = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'proof.html')
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def reply(self, code, body, ctype='application/json; charset=utf-8'):
+            if not isinstance(body, bytes):
+                body = json.dumps(body, ensure_ascii=False).encode('utf-8')
+            self.send_response(code)
+            self.send_header('Content-Type', ctype)
+            self.send_header('Content-Length', str(len(body)))
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            if self.path == '/':
+                self.reply(200, open(page, 'rb').read(), 'text/html; charset=utf-8')
+            elif self.path == '/rows':
+                self.reply(200, [{'key': k, 'section': r['розділ'], 'en': r['EN'], 'ua': r['UA'],
+                                  'forms': r['відмінки'], 'mark': r['вичитано'], 'note': r['коментар']}
+                                 for k, r in read_sheet().items()])
+            else:
+                self.reply(404, {'error': 'not found'})
+
+        def do_POST(self):
+            if self.path != '/mark':
+                return self.reply(404, {'error': 'not found'})
+            try:
+                req = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+                set_mark(req['key'], req['mark'], req['note'])
+            except PermissionError:
+                return self.reply(423, {'error': 'proofreading.csv зайнятий іншою програмою (Excel?). Закрийте його.'})
+            except KeyError as e:
+                return self.reply(409, {'error': 'рядка %s немає в CSV' % e})
+            self.reply(200, {'ok': True})
+
+    try:
+        server = http.server.HTTPServer(('127.0.0.1', port), Handler)
+    except OSError:
+        server = http.server.HTTPServer(('127.0.0.1', 0), Handler)      # the port is taken
+    url = 'http://127.0.0.1:%d/' % server.server_address[1]
+    print('proofreading at %s  (Ctrl+C stops it)' % url)
+    webbrowser.open(url)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+
 def main():
     d4x.configure_stdout()
     if '--status' in sys.argv:
         status()
+    elif '--web' in sys.argv:
+        web()
     else:
         sync()
 

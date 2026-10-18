@@ -100,7 +100,7 @@ py tools/build.py --uninstall
 | `tools/extract.py` | витягає англійський текст гри в `local/` для роботи |
 | `tools/merge.py` | вливає нову порцію перекладу |
 | `tools/review.py` | вивантажує переклад у таблицю Excel для редагування й забирає правки назад |
-| `tools/proof.py` | веде таблицю ручної редактури (`translation/proofreading.csv`): правки й позначки |
+| `tools/proof.py`, `tools/proof.html` | веде таблицю ручної редактури (`translation/proofreading.csv`): правки й позначки; `--web` показує її в браузері по рядку |
 | `tools/status.py` | рахує поступ перекладу й редактури та оновлює значки в цьому README |
 | `tools/fonts.py`, `tools/bfnt.py`, `tools/preview.py` | шрифти: додавання літер, формат BFNT, попередній перегляд |
 | `tools/d4x.py` | спільна бібліотека: формат PAK, мовні XML, обхід `data.cdb` |
@@ -121,6 +121,7 @@ py tools/merge.py <порція.tsv>          влити свої рядки в 
 py tools/check.py -v                    перевірити й побачити поступ
 py tools/build.py --install             зібрати й подивитися в грі
 py tools/review.py <назва> <префікс>    таблиця для редагування (і --import для правок)
+py tools/proof.py --web                 вичитка в браузері: → прийняти, ← відхилити, ↓ коментар
 ```
 
 Порція — текстовий файл: ключ, табуляція, переклад. Назву з усіма відмінками задає один рядок:

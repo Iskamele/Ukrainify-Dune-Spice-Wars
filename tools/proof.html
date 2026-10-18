@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вичитка</title>
+<!-- Served by `py tools/proof.py --web`; the rows come from translation/proofreading.csv. -->
+<style>
+:root {
+  --bg: #f3f0e9; --card: #fffdf8; --ink: #1f1c17; --muted: #6e675c; --line: #e1d9cb;
+  --accent: #a85a18; --ok: #2d7a4c; --bad: #b2372d; --ok-soft: #2d7a4c1f; --bad-soft: #b2372d1c;
+  --chip: #f2e7d5; --chip-ink: #7b4914; --var: #3d5f8f; --tag: #958c7e; --shadow: 0 1px 2px #0000000d, 0 8px 28px #0000000f;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15130f; --card: #1f1c17; --ink: #ebe5d9; --muted: #9a9286; --line: #36312a;
+    --accent: #e08b3e; --ok: #5bbd82; --bad: #eb6b5f; --ok-soft: #5bbd8224; --bad-soft: #eb6b5f22;
+    --chip: #3a2c1b; --chip-ink: #f1b97c; --var: #8db3e8; --tag: #7c756a; --shadow: 0 1px 2px #0000004d, 0 8px 28px #00000040;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15130f; --card: #1f1c17; --ink: #ebe5d9; --muted: #9a9286; --line: #36312a;
+  --accent: #e08b3e; --ok: #5bbd82; --bad: #eb6b5f; --ok-soft: #5bbd8224; --bad-soft: #eb6b5f22;
+  --chip: #3a2c1b; --chip-ink: #f1b97c; --var: #8db3e8; --tag: #7c756a; --shadow: 0 1px 2px #0000004d, 0 8px 28px #00000040;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 16px/1.5 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  min-height: 100vh;
+}
+kbd {
+  display: inline-block; min-width: 1.6em; padding: 0 .35em; border: 1px solid var(--line);
+  border-bottom-width: 2px; border-radius: 5px; background: var(--card);
+  font: 600 .85em/1.5 "Segoe UI", system-ui, sans-serif; text-align: center; color: var(--ink);
+}
+
+header {
+  position: sticky; top: 0; z-index: 2; background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.top {
+  max-width: 920px; margin: 0 auto; padding: 12px 16px 10px;
+  display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center;
+}
+.brand { font-weight: 700; font-size: 18px; letter-spacing: .01em; }
+.counts { color: var(--muted); font-size: 14px; flex: 1 1 auto; }
+.counts b { color: var(--ink); font-weight: 600; }
+.counts .ok { color: var(--ok); } .counts .bad { color: var(--bad); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.filters label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+select {
+  font: inherit; font-size: 14px; color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-radius: 7px; padding: 4px 8px; max-width: 260px;
+}
+.bar { height: 3px; display: flex; background: var(--line); }
+.bar div { height: 100%; transition: width .25s; }
+#bar-ok { background: var(--ok); } #bar-bad { background: var(--bad); }
+
+main { max-width: 920px; margin: 0 auto; padding: 20px 16px 48px; }
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: var(--shadow); padding: 18px 22px 20px; overflow-wrap: anywhere;
+}
+.card.in-r { animation: in-r .16s ease-out; }
+.card.in-l { animation: in-l .16s ease-out; }
+.card.in-u { animation: in-u .16s ease-out; }
+@keyframes in-r { from { transform: translateX(28px); opacity: 0; } }
+@keyframes in-l { from { transform: translateX(-28px); opacity: 0; } }
+@keyframes in-u { from { transform: translateY(-14px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .card.in-r, .card.in-l, .card.in-u { animation: none; } }
+
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 4px; }
+.sec {
+  background: var(--chip); color: var(--chip-ink); font-weight: 600; font-size: 13px;
+  padding: 2px 10px; border-radius: 999px;
+}
+.state { font-size: 13px; font-weight: 600; color: var(--muted); }
+.state.ok { color: var(--ok); } .state.bad { color: var(--bad); }
+.pos { margin-left: auto; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.key {
+  font: 12px/1.4 "Cascadia Mono", Consolas, ui-monospace, monospace; color: var(--muted);
+  margin-bottom: 14px; user-select: all;
+}
+.block { padding: 12px 0; border-top: 1px solid var(--line); }
+.lbl { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+.txt { white-space: pre-wrap; }
+.en .txt { font-size: 17px; color: var(--ink); opacity: .82; }
+.ua .txt { font-size: 21px; line-height: 1.45; }
+.link {
+  color: var(--chip-ink); background: var(--chip); border-radius: 4px; padding: 0 3px;
+  font-size: .86em; font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; cursor: help;
+}
+.link b { color: var(--accent); }
+.var { color: var(--var); font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: .86em; }
+.tag { color: var(--tag); font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: .78em; }
+
+.forms { margin-top: 10px; overflow-x: auto; }
+.forms table { border-collapse: collapse; font-size: 15px; }
+.forms th, .forms td { padding: 3px 12px 3px 0; text-align: left; vertical-align: top; white-space: nowrap; overflow-wrap: normal; }
+.forms th { font-size: 12px; color: var(--muted); font-weight: 600; }
+.forms td:first-child { color: var(--muted); font-size: 12px; }
+.forms.same { font-size: 14px; color: var(--muted); }
+.forms.same b { color: var(--ink); font-weight: 600; }
+
+.note {
+  margin-top: 4px; padding: 10px 12px; border-radius: 8px; background: var(--chip);
+  white-space: pre-wrap; font-size: 15px;
+}
+.note::before { content: "Коментар: "; font-weight: 600; color: var(--chip-ink); }
+.editor { margin-top: 12px; }
+.editor .lbl { font-size: 13px; letter-spacing: 0; font-weight: 600; color: var(--ink); }
+.editor.reject .lbl { color: var(--bad); }
+.editor textarea {
+  width: 100%; min-height: 84px; resize: vertical; font: inherit; font-size: 16px; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+}
+.editor textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.editor.need textarea { outline: 2px solid var(--bad); animation: shake .25s; }
+@keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.editor .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.actions button {
+  font: inherit; font-weight: 600; font-size: 15px; padding: 12px 8px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.actions button:hover { border-color: var(--muted); }
+.actions [data-act="reject"] { color: var(--bad); background: var(--bad-soft); border-color: transparent; }
+.actions [data-act="accept"] { color: var(--ok); background: var(--ok-soft); border-color: transparent; }
+.actions button:disabled { opacity: .4; cursor: default; }
+.help { font-size: 13px; color: var(--muted); text-align: center; margin-top: 14px; }
+
+.done { text-align: center; padding: 28px 8px; }
+.done h2 { margin: 0 0 6px; font-size: 22px; }
+.done p { color: var(--muted); margin: 6px 0; }
+code { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: .9em; }
+
+.banner {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; max-width: 720px; margin: 0 auto; z-index: 5;
+  background: var(--bad); color: #fff; border-radius: 10px; padding: 10px 14px;
+  display: flex; gap: 12px; align-items: center; box-shadow: var(--shadow);
+}
+.banner[hidden] { display: none; }
+.banner span { flex: 1; }
+.banner button { font: inherit; font-weight: 600; border: 0; border-radius: 7px; padding: 5px 12px; cursor: pointer; }
+.toast {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 4;
+  background: var(--ink); color: var(--bg); padding: 6px 14px; border-radius: 999px; font-size: 14px;
+  opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; max-width: calc(100% - 32px);
+  overflow: hidden; text-overflow: ellipsis;
+}
+.toast.on { opacity: .92; }
+.saving { font-size: 12px; color: var(--muted); }
+@media (max-width: 560px) {
+  .ua .txt { font-size: 19px; } .card { padding: 14px 14px 16px; }
+  .actions button { font-size: 14px; flex-direction: column; gap: 2px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand">Вичитка</div>
+    <div class="counts" id="counts">завантаження…</div>
+    <span class="saving" id="saving"></span>
+    <div class="filters">
+      <label>Розділ <select id="section"></select></label>
+      <label>Показати
+        <select id="show">
+          <option value="todo">неперевірені</option>
+          <option value="bad">відхилені</option>
+          <option value="ok">прийняті</option>
+          <option value="all">усі</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="bar"><div id="bar-ok"></div><div id="bar-bad"></div></div>
+</header>
+
+<main>
+  <div class="card" id="card"></div>
+  <div class="actions">
+    <button data-act="reject"><kbd>←</kbd> Відхилити</button>
+    <button data-act="note"><kbd>↓</kbd> Коментар</button>
+    <button data-act="accept"><kbd>→</kbd> Прийняти</button>
+  </div>
+  <p class="help"><kbd>↑</kbd> попередній рядок · у полі коментаря: <kbd>Enter</kbd> зберегти,
+    <kbd>Shift</kbd>+<kbd>Enter</kbd> новий рядок, <kbd>Esc</kbd> скасувати</p>
+</main>
+
+<div class="banner" id="banner" hidden><span id="banner-text"></span><button id="retry">Повторити</button></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const OK = new Set(['✓', '✔', '+', 'v', 'V', '1']);           // as in proof.py
+const isOk = m => OK.has(m.trim());
+const isBad = m => m.trim() !== '' && !isOk(m);
+const $ = id => document.getElementById(id);
+
+let rows = [];          // every row of the CSV
+let view = [];          // indices into rows for the current filter
+let pos = 0;            // place in view
+let editor = null;      // null | 'note' | 'reject'
+let noted = false;      // a comment was written with ↓ on this row just now
+
+const store = {
+  get(k) { try { return localStorage.getItem('proof.' + k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem('proof.' + k, v); } catch (e) {} },
+};
+
+// ---------------------------------------------------------------- text ---
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const TOKEN = /(\[[^\]\n]*\][a-zA-Z]*|::[^:\s]+::|<\/?[a-zA-Z][^>]*>)/;
+const CASES = { a: 'знахідний', d: 'давальний', g: 'родовий', i: 'орудний', pr: 'місцевий',
+                l: 'називний з малої', lc: 'називний з малої', p: 'множина', s: 'множина' };
+function suffixHint(s) {
+  if (!s) return 'називний, з великої літери';
+  let plural = false;
+  if (s.length > 1 && /[ps]$/.test(s) && s !== 'pr') { plural = true; s = s.slice(0, -1); }
+  return CASES[s] ? CASES[s] + (plural ? ', множина' : '') : 'суфікс ' + s;
+}
+function token(t) {
+  const m = t.match(/^\[([^\]]*)\]([a-zA-Z]*)$/);
+  if (m) return `<span class="link" title="${esc(suffixHint(m[2]))}">[${esc(m[1])}]<b>${esc(m[2])}</b></span>`;
+  if (t.startsWith('::')) return `<span class="var">${esc(t)}</span>`;
+  return `<span class="tag">${esc(t)}</span>`;
+}
+const rich = s => s.split(TOKEN).map((p, i) => i % 2 ? token(p) : esc(p)).join('');
+
+function formsHtml(f) {
+  if (!f.trim()) return '';
+  const parts = f.split('|').map(p => p.split(';').map(x => x.trim()));
+  const all = parts.flat();
+  if (all.every(x => x === all[0])) return `<div class="forms same">усі відмінки й множина: <b>${esc(all[0])}</b></div>`;
+  const head = ['Н', 'Р', 'Д', 'З', 'О', 'М'].map(h => `<th>${h}</th>`).join('');
+  const body = parts.map((p, i) => `<tr><td>${i ? 'мн.' : 'одн.'}</td>${p.map(x => `<td>${esc(x)}</td>`).join('')}</tr>`).join('');
+  return `<div class="forms"><table><tr><th></th>${head}</tr>${body}</table></div>`;
+}
+
+// ---------------------------------------------------------------- view ---
+function matches(r, sec, show) {
+  if (sec && r.section !== sec) return false;
+  return show === 'all' || (show === 'todo' && !r.mark.trim()) || (show === 'ok' && isOk(r.mark)) || (show === 'bad' && isBad(r.mark));
+}
+function rebuild(keepKey) {
+  const sec = $('section').value, show = $('show').value;
+  view = rows.map((r, i) => i).filter(i => matches(rows[i], sec, show));
+  const at = keepKey ? view.findIndex(i => rows[i].key === keepKey) : -1;
+  pos = at >= 0 ? at : 0;
+  editor = null; noted = false;
+  render('u');
+}
+function sectionOptions(cur = $('section').value) {
+  const sel = $('section');
+  const order = [], todo = {}, total = {};
+  for (const r of rows) {
+    if (!(r.section in total)) { order.push(r.section); total[r.section] = 0; todo[r.section] = 0; }
+    total[r.section]++; if (!r.mark.trim()) todo[r.section]++;
+  }
+  const left = rows.filter(r => !r.mark.trim()).length;
+  const open = order.filter(s => todo[s]), closed = order.filter(s => !todo[s]);
+  sel.innerHTML = `<option value="">усі розділи (${left})</option>` +
+    (open.length ? `<optgroup label="Залишилось">${open.map(s => `<option value="${esc(s)}">${esc(s)} (${todo[s]})</option>`).join('')}</optgroup>` : '') +
+    (closed.length ? `<optgroup label="Переглянуто">${closed.map(s => `<option value="${esc(s)}">${esc(s)} ✓</option>`).join('')}</optgroup>` : '');
+  sel.value = order.includes(cur) ? cur : '';
+}
+function counts() {
+  const sec = $('section').value;
+  const scope = sec ? rows.filter(r => r.section === sec) : rows;
+  const ok = scope.filter(r => isOk(r.mark)).length, bad = scope.filter(r => isBad(r.mark)).length;
+  const n = scope.length || 1;
+  $('counts').innerHTML = `<b>${scope.length - ok - bad}</b> залишилось · <span class="ok">✓ ${ok}</span> · <span class="bad">✗ ${bad}</span> з ${scope.length}`;
+  $('bar-ok').style.width = (100 * ok / n) + '%';
+  $('bar-bad').style.width = (100 * bad / n) + '%';
+}
+
+function render(dir) {
+  const card = $('card');
+  counts();
+  const done = pos >= view.length;
+  document.querySelectorAll('.actions button').forEach(b => b.disabled = done);
+  if (done) {
+    card.innerHTML = view.length
+      ? `<div class="done"><h2>У цій вибірці все переглянуто</h2><p><kbd>↑</kbd> — повернутися до останнього рядка.</p>
+         <p>Відхилені рядки з коментарями: <code>py tools/proof.py --status</code></p></div>`
+      : `<div class="done"><h2>Тут порожньо</h2><p>Немає рядків для цього фільтра.</p></div>`;
+  } else {
+    const r = rows[view[pos]];
+    const state = isOk(r.mark) ? '<span class="state ok">✓ прийнято</span>'
+                : isBad(r.mark) ? `<span class="state bad">${esc(r.mark.trim())} відхилено</span>`
+                : '<span class="state">не перевірено</span>';
+    card.innerHTML = `
+      <div class="meta"><span class="sec">${esc(r.section)}</span>${state}<span class="pos">${pos + 1} / ${view.length}</span></div>
+      <div class="key">${esc(r.key)}</div>
+      <div class="block en"><div class="lbl">EN</div><div class="txt">${rich(r.en)}</div></div>
+      <div class="block ua"><div class="lbl">UA</div><div class="txt">${rich(r.ua)}</div>${formsHtml(r.forms)}</div>
+      ${r.note.trim() && editor === null ? `<div class="note">${esc(r.note)}</div>` : ''}
+      ${editor ? `<div class="editor ${editor}">
+        <div class="lbl">${editor === 'reject' ? 'Що не так? Коментар обов\'язковий' : 'Коментар — позначка не зміниться, далі ← або →'}</div>
+        <textarea id="text" spellcheck="true" lang="uk"></textarea>
+        <div class="hint">Enter — ${editor === 'reject' ? 'відхилити' : 'зберегти'} · Shift+Enter — новий рядок · Esc — скасувати</div>
+      </div>` : ''}`;
+    if (editor) {
+      const t = $('text');
+      t.value = r.note;
+      t.focus();
+      t.setSelectionRange(t.value.length, t.value.length);
+    }
+  }
+  if (dir) { card.classList.remove('in-r', 'in-l', 'in-u'); void card.offsetWidth; card.classList.add('in-' + dir); }
+}
+
+// ------------------------------------------------------------- actions ---
+const current = () => pos < view.length ? rows[view[pos]] : null;
+function next(dir) {
+  editor = null; noted = false;
+  pos = Math.min(pos + 1, view.length);
+  sectionOptions();
+  render(dir);
+}
+function prev() {
+  if (pos === 0) return;
+  editor = null; noted = false; pos--;
+  render('u');
+}
+function decide(r, mark, note, dir, label) {
+  r.mark = mark; r.note = note;
+  save(r);
+  toast(label + ' · ' + r.key);
+  next(dir);
+}
+function accept() {
+  const r = current(); if (!r) return;
+  const note = editor ? $('text').value.trim() : r.note;
+  decide(r, '✓', note, 'r', '✓ прийнято');
+}
+function reject() {
+  const r = current(); if (!r) return;
+  if (editor) return submit('reject');
+  if (noted && r.note.trim()) return decide(r, '✗', r.note, 'l', '✗ відхилено');
+  openEditor('reject');
+}
+function openEditor(mode) {
+  if (!current()) return;
+  editor = mode;
+  render();
+}
+function closeEditor() { editor = null; render(); }
+function submit(as) {
+  const r = current(), t = $('text'), text = t.value.trim();
+  const mode = as || editor;
+  if (mode === 'reject') {
+    if (!text) {
+      const box = t.parentElement;
+      box.classList.remove('need'); void box.offsetWidth; box.classList.add('need');
+      t.focus();
+      return;
+    }
+    return decide(r, '✗', text, 'l', '✗ відхилено');
+  }
+  r.note = text;
+  noted = !!text;
+  save(r);
+  toast(text ? 'коментар збережено' : 'коментар прибрано');
+  editor = null;
+  render();
+}
+
+// --------------------------------------------------------------- saving ---
+const queue = [];
+let busy = false;
+function save(r) { queue.push({ key: r.key, mark: r.mark, note: r.note }); flush(); }
+async function flush() {
+  if (busy) return;
+  busy = true;
+  while (queue.length) {
+    $('saving').textContent = 'зберігаю…';
+    try {
+      const res = await fetch('/mark', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(queue[0]) });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'помилка ' + res.status);
+      queue.shift();
+    } catch (e) {
+      busy = false;
+      $('saving').textContent = '';
+      const msg = e instanceof TypeError ? 'Сервер не відповідає. Запустіть py tools/proof.py --web' : e.message;
+      $('banner-text').textContent = `Не збережено (${queue.length}): ${msg}`;
+      $('banner').hidden = false;
+      return;
+    }
+  }
+  busy = false;
+  $('saving').textContent = '';
+  $('banner').hidden = true;
+}
+$('retry').onclick = flush;
+window.addEventListener('beforeunload', e => { if (queue.length) { e.preventDefault(); e.returnValue = ''; } });
+
+let toastTimer;
+function toast(text) {
+  const t = $('toast');
+  t.textContent = text; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 1100);
+}
+
+// ---------------------------------------------------------------- input ---
+document.addEventListener('keydown', e => {
+  if (e.target.matches('textarea')) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); submit(); }
+    else if (e.key === 'Escape') { e.preventDefault(); closeEditor(); }
+    return;
+  }
+  if (e.target.matches('select')) { if (e.key === 'Escape') e.target.blur(); return; }
+  if (e.ctrlKey || e.altKey || e.metaKey || e.repeat) return;
+  const act = { ArrowRight: accept, ArrowLeft: reject, ArrowDown: () => openEditor('note'), ArrowUp: prev }[e.key];
+  if (act) { e.preventDefault(); act(); }
+});
+document.querySelectorAll('.actions button').forEach(b => b.addEventListener('click', () => {
+  b.blur();
+  ({ reject, accept, note: () => editor === 'note' ? submit() : openEditor('note') })[b.dataset.act]();
+}));
+for (const id of ['section', 'show']) {
+  $(id).addEventListener('change', e => {
+    store.set(id, e.target.value);
+    const r = current();
+    rebuild(r && r.key);
+    e.target.blur();
+  });
+}
+
+(async function start() {
+  try {
+    rows = await (await fetch('/rows')).json();
+  } catch (e) {
+    $('counts').textContent = '';
+    $('card').innerHTML = '<div class="done"><h2>Немає зв\'язку із сервером</h2><p>Запустіть <code>py tools/proof.py --web</code></p></div>';
+    return;
+  }
+  const show = store.get('show');
+  if (show && [...$('show').options].some(o => o.value === show)) $('show').value = show;
+  sectionOptions(store.get('section') || '');
+  rebuild();
+})();
+</script>
+</body>
+</html>
