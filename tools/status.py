@@ -8,15 +8,18 @@ translation/proofreading.csv (tools/proof.py): the ones a release ships.
 --readme rewrites, in README.md, the two badges after the game badge and the
 two lines this tool owns: the one starting "Перекладено **" and the one
 starting "**Status:**". Everything else in the README is left as written.
+It also rewrites ukrainify.json, which the GitHub profile (Iskamele/iskamele)
+reads to show this translation's progress.
 
 Usage:
     python tools/status.py            print the figures
     python tools/status.py --readme   and update README.md
 """
-import os, re, sys
+import json, os, re, sys
 import d4x, check, proof
 
 README = os.path.join(d4x.ROOT, 'README.md')
+MANIFEST = os.path.join(d4x.ROOT, 'ukrainify.json')
 
 
 def figures():
@@ -61,6 +64,13 @@ def update_readme(tr, pr, total):
         f.write(text)
 
 
+def write_manifest(tr, pr, total):
+    manifest = {'game': 'Dune: Spice Wars', 'steam_appid': 1605220,
+                'lines': {'done': tr, 'total': total}, 'edited': pr}
+    with open(MANIFEST, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+
+
 def main():
     d4x.configure_stdout()
     tr, pr, total = figures()
@@ -69,6 +79,8 @@ def main():
     if '--readme' in sys.argv:
         update_readme(tr, pr, total)
         print('updated  README.md')
+        write_manifest(tr, pr, total)
+        print('updated  ukrainify.json')
 
 
 if __name__ == '__main__':
