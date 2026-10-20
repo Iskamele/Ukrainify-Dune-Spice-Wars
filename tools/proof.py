@@ -31,8 +31,10 @@ tools/build.py --proofread ships the marked rows only.
 
 --web syncs, then opens a page in the browser that shows one row at a time:
 → marks it ✓, ← marks it ✗ (a comment is required), ↓ writes a comment and
-waits for ← or →, ↑ goes back a row. Every decision is written to the CSV at
-once, so the page can be closed at any moment. Close the CSV in Excel first:
+waits for ← or →, ↑ goes back a row. Under the UA it shows how the line reads
+in the game: links replaced by the names in the right case, as far as the
+game data tells. Every decision is written to the CSV at once, so the page
+can be closed at any moment. Close the CSV in Excel first:
 Excel locks the file.
 
 Usage:
@@ -263,6 +265,25 @@ def set_mark(key, mark, note):
     write_sheet(sheet.values())
 
 
+NAME_KEY = re.compile(r'^export:[^/]+/([^/]+)/(?:texts\.)?(?:([a-zA-Z]+)\.)?(name|shortName|longName|adjective)$')
+
+
+def link_names(source, entries):
+    """-> {link target: {field: {case: text}}}: what a link turns into in the
+    game, for the page's preview (the Ukrainian where there is one). Only the
+    targets some line links to are kept."""
+    targets = {d4x.link_target(m.group(1)) for s in source.values() for m in d4x.LINK_RE.finditer(s['en'])}
+    found = collections.defaultdict(dict)
+    for key, s in source.items():
+        m = NAME_KEY.match(key)
+        if not m or m.group(1).lower() not in targets:
+            continue
+        fields = found[m.group(1).lower()].setdefault(key.split('/', 1)[0], {})
+        fields.setdefault(m.group(3).lower(), {})[m.group(2) or ''] = entries.get(key, {}).get('uk') or s['en']
+    # an id used on several sheets: the one with case forms is what links mean
+    return {t: max(sheets.values(), key=lambda f: sum(map(len, f.values()))) for t, sheets in found.items()}
+
+
 def web(port=8723):
     import http.server, webbrowser
     try:
@@ -270,6 +291,7 @@ def web(port=8723):
     except PermissionError:
         sys.exit('proofreading.csv is open in another program (Excel?): close it and run again')
     page = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'proof.html')
+    names = link_names(d4x.load_source(), d4x.load_translation())
 
     class Handler(http.server.BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -292,6 +314,8 @@ def web(port=8723):
                 self.reply(200, [{'key': k, 'section': r['розділ'], 'en': r['EN'], 'ua': r['UA'],
                                   'forms': r['відмінки'], 'mark': r['вичитано'], 'note': r['коментар']}
                                  for k, r in read_sheet().items()])
+            elif self.path == '/names':
+                self.reply(200, names)
             else:
                 self.reply(404, {'error': 'not found'})
 

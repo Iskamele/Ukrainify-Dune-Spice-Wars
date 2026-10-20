@@ -95,6 +95,12 @@ main { max-width: 920px; margin: 0 auto; padding: 20px 16px 48px; }
 .link b { color: var(--accent); }
 .var { color: var(--var); font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: .86em; }
 .tag { color: var(--tag); font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; font-size: .78em; }
+.game { margin-top: 10px; padding: 8px 12px; border-left: 3px solid var(--chip); background: var(--bg); border-radius: 0 8px 8px 0; }
+.game .lbl { margin-bottom: 2px; }
+.game .txt { font-size: 17px; }
+.res { border-bottom: 1px dotted var(--accent); cursor: help; }
+.t-good { color: var(--ok); } .t-bad { color: var(--bad); } .t-warning { color: var(--accent); }
+.t-gold { color: var(--chip-ink); } .t-i { font-style: italic; }
 
 .forms { margin-top: 10px; overflow-x: auto; }
 .forms table { border-collapse: collapse; font-size: 15px; }
@@ -223,13 +229,58 @@ function suffixHint(s) {
   if (s.length > 1 && /[ps]$/.test(s) && s !== 'pr') { plural = true; s = s.slice(0, -1); }
   return CASES[s] ? CASES[s] + (plural ? ', множина' : '') : 'суфікс ' + s;
 }
-function token(t) {
+function token(t, ua) {
   const m = t.match(/^\[([^\]]*)\]([a-zA-Z]*)$/);
-  if (m) return `<span class="link" title="${esc(suffixHint(m[2]))}">[${esc(m[1])}]<b>${esc(m[2])}</b></span>`;
+  if (m) {
+    const word = ua ? resolve(m[1], m[2]) : null;
+    const hint = (word !== null ? word + ' · ' : '') + suffixHint(m[2]);
+    return `<span class="link" title="${esc(hint)}">[${esc(m[1])}]<b>${esc(m[2])}</b></span>`;
+  }
   if (t.startsWith('::')) return `<span class="var">${esc(t)}</span>`;
   return `<span class="tag">${esc(t)}</span>`;
 }
-const rich = s => s.split(TOKEN).map((p, i) => i % 2 ? token(p) : esc(p)).join('');
+const rich = (s, ua) => s.split(TOKEN).map((p, i) => i % 2 ? token(p, ua) : esc(p)).join('');
+
+// ---------------------------------------------------- the line in the game ---
+let NAMES = {};         // link target -> field -> case -> text, from /names
+const CASE_KEY = { '': '', a: 'accusative', d: 'dative', g: 'genitive', i: 'instrumental', pr: 'prepositional',
+                   l: 'nominativeLc', lc: 'nominativeLc' };
+function resolve(body, suffix) {
+  let id = body.replace(/^!/, ''), field = 'name';
+  const v = id.match(/^(.*)-(adjective|shortname|longname)$/i);
+  if (v) { id = v[1]; field = v[2].toLowerCase(); }
+  const forms = (NAMES[id.toLowerCase()] || {})[field];
+  if (!forms) return null;                               // a variable, or not in the game data
+  let s = suffix, plural = false;
+  if (s === 'p' || s === 's') { s = ''; plural = true; }
+  else if (s.length > 1 && /[ps]$/.test(s) && s !== 'pr') { plural = true; s = s.slice(0, -1); }
+  const c = CASE_KEY[s];
+  if (c === undefined) return null;
+  const word = forms[plural ? (c ? c + 'Plural' : 'plural') : c] ?? forms[''];   // no case forms: the game shows the name as is
+  return word === undefined ? null : field === 'longname' ? word.replace(/\|/g, ' ') : word;
+}
+const STYLED = new Set(['good', 'bad', 'warning', 'gold', 'i']);
+function inGame(s) {
+  const open = [];
+  const out = s.split(TOKEN).map((p, i) => {
+    if (!(i % 2)) return esc(p);
+    const m = p.match(/^\[([^\]]*)\]([a-zA-Z]*)$/);
+    if (m) {
+      const word = resolve(m[1], m[2]);
+      return word === null ? token(p) : `<span class="res" title="${esc(p)}">${esc(word)}</span>`;
+    }
+    if (p.startsWith('::')) return token(p);
+    const t = p.match(/^<(\/?)([a-zA-Z][\w-]*)[^>]*?(\/?)>$/);
+    if (!t) return esc(p);
+    const name = t[2].toLowerCase();
+    if (name === 'br') return '\n';
+    if (t[3]) return '';
+    if (t[1]) return open.pop() ? '</span>' : '';
+    open.push(STYLED.has(name));
+    return STYLED.has(name) ? `<span class="t-${name}">` : '';
+  }).join('');
+  return out + open.filter(Boolean).map(() => '</span>').join('');
+}
 
 function formsHtml(f) {
   if (!f.trim()) return '';
@@ -297,7 +348,8 @@ function render(dir) {
       <div class="meta"><span class="sec">${esc(r.section)}</span>${state}<span class="pos">${pos + 1} / ${view.length}</span></div>
       <div class="key">${esc(r.key)}</div>
       <div class="block en"><div class="lbl">EN</div><div class="txt">${rich(r.en)}</div></div>
-      <div class="block ua"><div class="lbl">UA</div><div class="txt">${rich(r.ua)}</div>${formsHtml(r.forms)}</div>
+      <div class="block ua"><div class="lbl">UA</div><div class="txt">${rich(r.ua, true)}</div>${formsHtml(r.forms)}
+        ${/\[[^\]\n]*\]|<[a-zA-Z/]/.test(r.ua) ? `<div class="game"><div class="lbl">У ГРІ</div><div class="txt">${inGame(r.ua)}</div></div>` : ''}</div>
       ${r.note.trim() && editor === null ? `<div class="note">${esc(r.note)}</div>` : ''}
       ${editor ? `<div class="editor ${editor}">
         <div class="lbl">${editor === 'reject' ? 'Що не так? Коментар обов\'язковий' : 'Коментар — позначка не зміниться, далі ← або →'}</div>
@@ -433,7 +485,7 @@ for (const id of ['section', 'show']) {
 
 (async function start() {
   try {
-    rows = await (await fetch('/rows')).json();
+    [rows, NAMES] = await Promise.all([fetch('/rows').then(r => r.json()), fetch('/names').then(r => r.ok ? r.json() : {})]);
   } catch (e) {
     $('counts').textContent = '';
     $('card').innerHTML = '<div class="done"><h2>Немає зв\'язку із сервером</h2><p>Запустіть <code>py tools/proof.py --web</code></p></div>';
