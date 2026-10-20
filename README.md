@@ -8,15 +8,15 @@
 
 ## Стан перекладу
 
-Перекладено **9 714 з 18 972 рядків (51%)**, відредаговано вручну **9 687 (51%)**. До збірки потрапляють лише відредаговані рядки, решту гра показує англійською.
+Перекладено **9 714 з 18 972 рядків (51%)**, відредаговано вручну **9 714 (51%)**. До збірки потрапляють лише відредаговані рядки, решту гра показує англійською.
 
 | Розділ | Переклад | Редактура |
 |---|---|---|
 | Інтерфейс: меню, підказки, Ландсраад, ринок ДАПТ, шпигунство, дипломатія, торгівля, «Завоювання», налаштування | готово | готово |
 | Ресурси: назви, усі відмінки, описи | готово | готово |
-| Фракції: назви, відмінки, описи | готово | майже готово |
+| Фракції: назви, відмінки, описи | готово | готово |
 | Бойові одиниці: назви з усіма відмінками й множиною | готово, описи — ні | готово |
-| Будівлі, споруди, регіони, території: назви з усіма відмінками, описи, бонуси | готово | майже готово |
+| Будівлі, споруди, регіони, території: назви з усіма відмінками, описи, бонуси | готово | готово |
 | Шрифти: літери Ї, Є, Ґ у всіх 8 шрифтах гри | готово | — |
 | Риси, здібності, розробки, спорядження | далі в черзі | — |
 | Навчання, місії, події, репліки персонажів | — | — |
@@ -148,7 +148,7 @@ Dune: Spice Wars © Shiro Games, видавець Funcom. Dune © Herbert Proper
 
 An unofficial Ukrainian translation. Not affiliated with Shiro Games or Funcom.
 
-**Status:** 9,714 of 18,972 strings translated (51%), 9,687 edited by hand (51%). Releases ship edited lines only; everything else shows in English.
+**Status:** 9,714 of 18,972 strings translated (51%), 9,714 edited by hand (51%). Releases ship edited lines only; everything else shows in English.
 
 Translated so far: the whole UI, resources, factions, unit names with every grammatical case, buildings, structures, regions and territories, and the fonts (Ї, Є, Ґ added to all 8 game fonts). Traits, abilities, developments and equipment come next.
 
