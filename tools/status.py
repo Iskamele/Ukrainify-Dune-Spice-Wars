@@ -9,7 +9,8 @@ translation/proofreading.csv (tools/proof.py): the ones a release ships.
 two lines this tool owns: the one starting "Перекладено **" and the one
 starting "**Status:**". Everything else in the README is left as written.
 It also rewrites ukrainify.json, which the GitHub profile (Iskamele/iskamele)
-reads to show this translation's progress.
+reads to show this translation's progress. Both count what a release ships,
+so translated lines appear there once they are edited.
 
 Usage:
     python tools/status.py            print the figures
@@ -77,9 +78,9 @@ def main():
     print('translated %6d of %d  (%s)' % (tr, total, pct(tr, total)))
     print('edited     %6d of %d  (%s)' % (pr, total, pct(pr, total)))
     if '--readme' in sys.argv:
-        update_readme(tr, pr, total)
+        update_readme(pr, pr, total)
         print('updated  README.md')
-        write_manifest(tr, pr, total)
+        write_manifest(pr, pr, total)
         print('updated  ukrainify.json')
 
 
