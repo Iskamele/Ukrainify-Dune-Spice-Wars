@@ -27,32 +27,42 @@ Usage:
                                        translation/proofreading.csv (tools/proof.py)
     python tools/build.py --release 0.1
                                        --proofread, then pack the pak and the
-                                       install note into local/release/*.zip
+                                       install note and OFL.txt into local/release/*.zip
     python tools/build.py --uninstall  remove it from the game again
 """
 import collections, datetime, os, shutil, sys, zipfile
-import d4x, check, fonts, proof
+import d4x, check, fonts, proof, status
 
 PATCH = 'res.compressed1.pak'
 MARKER = 'ua-localization.txt'                   # tells our patch from anyone else's
 
 README_TXT = '''Dune: Spice Wars — українська локалізація, версія {version}
-Для гри версії {game}. Перекладено {n} рядків ({pct:.0f}%), решта поки англійською.
+Для гри версії {game}. Перекладено {n} рядків ({pct}), решта поки англійською.
 
 ВСТАНОВЛЕННЯ
 1. Скопіюйте res.compressed1.pak у папку гри, туди, де лежить res.compressed.pak.
    Steam: ПКМ на грі → Керувати → Переглянути локальні файли.
 2. У налаштуваннях гри оберіть мову «Français»: переклад займає цей слот.
+Запускати нічого не треба.
 
 ВИДАЛЕННЯ
-Видаліть res.compressed1.pak з папки гри. Перевірка цілісності файлів у Steam
-його не прибирає.
+Видаліть res.compressed1.pak з папки гри й поверніть мову в налаштуваннях.
+Перевірка цілісності файлів у Steam цей файл не прибирає.
 
 Після оновлення гри змінені рядки показуються англійською, доки не вийде
 нова версія перекладу.
 
+ЛІЦЕНЗІЯ
+Переклад — © Oleksandr Novikov, усі права захищено. Збірку можна встановити
+на власну копію гри; розміщення деінде — лише з письмової згоди автора
+(докладно — LICENSE у репозиторії). Шрифти з доданими літерами — SIL Open Font
+License 1.1, див. OFL.txt. Англійський текст перекладених рядків, потрібний
+грі для звірки, належить її власникам. Неофіційний переклад, не пов'язаний
+із Shiro Games чи Funcom.
+
 https://github.com/Iskamele/Ukrainify-Dune-Spice-Wars
 '''
+OFL = os.path.join(d4x.ROOT, 'licenses', 'OFL.txt')
 
 
 def arg(name, default=None):
@@ -188,12 +198,15 @@ def main():
 
     if release:
         shipped = len(texts) + len(export)
-        note = README_TXT.format(version=release, game=game.version, n=shipped, pct=100.0 * shipped / total)
+        counted = sum(check.coverage(d4x.load_translation(), d4x.load_source())[0].values())   # as in the README
+        note = README_TXT.format(version=release, game=game.version, n='{:,}'.format(shipped).replace(',', ' '),
+                                 pct=status.pct(shipped, counted))
         path = os.path.join(d4x.LOCAL, 'release', 'Dune-Spice-Wars-UA-%s.zip' % release)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as z:
             z.writestr(PATCH, pak)
             z.writestr('Встановлення.txt', '﻿' + note.replace('\n', '\r\n'))
+            z.writestr('OFL.txt', '﻿' + open(OFL, encoding='utf-8').read().replace('\n', '\r\n'))
         print('release  %s  (%.1f MB)' % (os.path.relpath(path, d4x.ROOT), os.path.getsize(path) / 1e6))
 
     if '--install' in sys.argv:

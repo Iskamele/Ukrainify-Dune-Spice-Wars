@@ -2,7 +2,7 @@
 
 Неофіційний переклад українською. Не пов'язаний із Shiro Games чи Funcom.
 
-![гра](https://img.shields.io/badge/гра-Steam-blue) ![переклад](https://img.shields.io/badge/переклад-51%25-orange) ![редактура](https://img.shields.io/badge/редактура-51%25-blue) ![версія](https://img.shields.io/badge/версія_гри-2.2.7-lightgrey)
+![гра](https://img.shields.io/badge/гра-Steam-blue) ![переклад](https://img.shields.io/badge/переклад-51%25-orange) ![редактура](https://img.shields.io/badge/редактура-51%25-blue) ![версія](https://img.shields.io/badge/версія_гри-2.2.8-lightgrey)
 
 [Dune: Spice Wars у Steam](https://store.steampowered.com/app/1605220/Dune_Spice_Wars/)
 
@@ -25,15 +25,17 @@
 
 ## Встановлення
 
-Готової збірки поки немає: переклад у роботі. Коли вийде, її можна буде завантажити зі сторінки [Releases](../../releases).
+1. Завантажте архів зі сторінки [Releases](../../releases) і розпакуйте його.
+2. Скопіюйте `res.compressed1.pak` у папку гри, туди, де лежить `res.compressed.pak`. У Steam: ПКМ на грі → Керувати → Переглянути локальні файли.
+3. У налаштуваннях гри оберіть мову «Français» (чому саме її — нижче).
+
+Запускати нічого не треба. Кожна збірка зроблена для версії гри, указаної в її описі; після оновлення гри змінені рядки показуються англійською, доки не вийде нова збірка.
 
 ## Видалення
 
-```
-py tools/build.py --uninstall
-```
+Видаліть `res.compressed1.pak` з папки гри й поверніть мову в налаштуваннях. Оригінальні файли гри не змінюються ні за встановлення, ні за видалення. Перевірка цілісності в Steam цей файл не прибирає — його треба видалити самому.
 
-Або просто видаліть `res.compressed1.pak` з папки гри. Оригінальні файли гри не змінюються ні за встановлення, ні за видалення. Перевірка цілісності в Steam цей файл не прибирає — його треба видалити самому.
+Якщо ви збирали патч самостійно: `py tools/build.py --uninstall`.
 
 ## Чому слот французької
 
@@ -82,11 +84,11 @@ py tools/build.py --uninstall
 
 Тінь растрових шрифтів перемальовується за моделлю, підібраною за наявними літерами (похибка менше 1%). Нові гліфи дописуються смугою під атласом, тож жодна стара літера не зсувається.
 
-**Нічого з гри не поширюється.** Репозиторій містить лише інструменти. Шрифти, еталонний англійський і готовий патч генеруються на вашому комп'ютері з вашої копії гри.
+**Що лежить у збірці.** Переклад, 8 шрифтів гри з доданими літерами і англійський текст перекладених рядків — еталон, без якого гра відкидає переклад. Шрифти поширюються на умовах SIL Open Font License 1.1 ([licenses/OFL.txt](licenses/OFL.txt)), англійський текст належить власникам гри. Сам репозиторій містить лише інструменти: ними таку саму збірку можна зробити з власної копії гри.
 
 ## Термінологія
 
-Канон — український переклад «Дюни» Френка Герберта (КСД, переклад Анатолія Пітика й Катерини Грицайчук): **прянощі, січ, ДАПТ, Атріди, Бене Ґессерит, Гільдія Лоцманів, гупало, транспортувальник, Ландсраад**. Терміни, яких у книзі немає, утворено за її зразком: **пласкрит, Картаґ, Дім Верніусів**.
+Канон — український переклад «Дюни» Френка Герберта: **прянощі, січ, ДАПТ, Атріди, Бене Ґессерит, Гільдія Лоцманів, гупало, транспортувальник, Ландсраад**. Терміни, яких у книзі немає, утворено за її зразком: **пласкрит, Картаґ, Дім Верніусів**.
 
 Глосарій ведеться разом із перекладом і до репозиторію не входить.
 
@@ -104,6 +106,7 @@ py tools/build.py --uninstall
 | `tools/status.py` | рахує поступ перекладу й редактури та оновлює значки в цьому README |
 | `tools/fonts.py`, `tools/bfnt.py`, `tools/preview.py` | шрифти: додавання літер, формат BFNT, попередній перегляд |
 | `tools/d4x.py` | спільна бібліотека: формат PAK, мовні XML, обхід `data.cdb` |
+| `licenses/OFL.txt` | ліцензія шрифтів, які потрапляють у збірку |
 
 Папка `local/` (не в репозиторії) містить текст самої гри — для роботи, не для поширення.
 
@@ -138,7 +141,9 @@ export:unit/A_Trooper/texts.name=forms	піхотинець; піхотинця;
 
 Код — MIT. Переклад і глосарій — усі права захищено: збірку можна завантажити з [Releases](../../releases) і встановити на власну копію гри; розміщення деінде (сайти, лаунчери, каталоги, збірки), використання як основи для інших перекладів і комерційне використання — лише з письмової згоди автора. Запит — через Issues. Деталі — у [LICENSE](LICENSE).
 
-Гра має бути придбана. Репозиторій не містить жодного файлу гри.
+Шрифти у збірці — SIL Open Font License 1.1 ([licenses/OFL.txt](licenses/OFL.txt)). Англійський текст перекладених рядків у збірці належить власникам гри.
+
+Гра має бути придбана: збірка — лише патч до неї. Репозиторій не містить жодного файлу гри.
 
 Dune: Spice Wars © Shiro Games, видавець Funcom. Dune © Herbert Properties LLC.
 
@@ -154,9 +159,13 @@ Translated so far: the whole UI, resources, factions, unit names with every gram
 
 ## Installing
 
-No release yet: the translation is in progress. Builds will be published on the [Releases](../../releases) page.
+1. Download the archive from the [Releases](../../releases) page and unpack it.
+2. Copy `res.compressed1.pak` into the game folder, next to `res.compressed.pak`. In Steam: right-click the game → Manage → Browse local files.
+3. In the game options, pick the language "Français" (see below why).
 
-To remove a build: `py tools/build.py --uninstall`, or delete `res.compressed1.pak` from the game folder (Steam's integrity check leaves it in place).
+Nothing needs to be run. Each build is made for the game version named in its description; after a game update, changed lines show in English until a new build is out.
+
+To remove it, delete `res.compressed1.pak` from the game folder and switch the language back (Steam's integrity check leaves the file in place). If you built the patch yourself: `py tools/build.py --uninstall`.
 
 ## Why the French slot
 
@@ -168,10 +177,10 @@ The language list is compiled into the game code (`hlboot.dat`); a new entry wou
 - **Reference English.** For each line the game compares the English it was translated from (`lang/old/export_<lang>_old.xml`) with the current English, and silently drops the line if they differ. The build writes its own reference from your copy. Every translated line stores a fingerprint of its English source, so stale translations never ship.
 - **Grammatical cases.** Names are inserted through links such as `[Spice]g`. The suffix picks one of 12 declension forms the translation provides for every name.
 - **Fonts.** The 8 UI fonts (six multi-channel signed distance fields, two shadowed bitmaps) lack `Ї ї Є є Ґ ґ`. The build derives them from glyphs the same font already has (`ï`; `І` with the dots of `Ï`; a mirrored `Э`; `Г` plus an upturn). New glyphs go into a strip appended under the atlas.
-- **Nothing from the game is distributed.** The repository holds the tools only. Fonts, the reference file and the patch are generated on your machine from your copy.
+- **What a build contains.** The translation, the 8 game fonts with the added letters, and the English of the translated lines (the reference without which the game drops a translation). The fonts are distributed under the SIL Open Font License 1.1 ([licenses/OFL.txt](licenses/OFL.txt)); the English text belongs to the game's owners. The repository itself holds the tools only, which make the same build from your own copy.
 
-Terminology follows the Ukrainian edition of Frank Herbert's *Dune* (KSD).
+Terminology follows the Ukrainian translation of Frank Herbert's *Dune*.
 
 ## Licences
 
-Code: MIT. Translation and glossary: all rights reserved. Download a build from [Releases](../../releases) and install it on your own copy; hosting it anywhere else (websites, launchers, catalogues, collections), using it as the basis for another translation, or any commercial use needs the author's written permission. Ask via Issues. See [LICENSE](LICENSE). You need to own the game; this repository contains no game files.
+Code: MIT. Translation and glossary: all rights reserved. Download a build from [Releases](../../releases) and install it on your own copy; hosting it anywhere else (websites, launchers, catalogues, collections), using it as the basis for another translation, or any commercial use needs the author's written permission. Ask via Issues. See [LICENSE](LICENSE). Fonts in a build: SIL Open Font License 1.1 ([licenses/OFL.txt](licenses/OFL.txt)); the English text in a build belongs to the game's owners. You need to own the game: a build is only a patch for it. This repository contains no game files.

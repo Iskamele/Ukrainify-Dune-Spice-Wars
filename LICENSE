@@ -44,7 +44,7 @@ terms.
    To ask for permission, open an issue in this repository.
 
    These terms cover the author's own work only. Terms taken from the
-   Ukrainian edition of Frank Herbert's "Dune" (KSD) are used for consistency
+   Ukrainian edition of Frank Herbert's "Dune" are used for consistency
    and remain the publisher's; the game's own text remains its owners'.
 
    Українською. Переклад і глосарій — © 2026 Oleksandr Novikov, усі права
@@ -55,20 +55,39 @@ terms.
    повністю чи частково як основи для іншого перекладу, порту чи проєкту;
    будь-яке комерційне використання. Запит на дозвіл — через Issues цього
    репозиторію. Ці умови стосуються лише власної роботи автора: терміни з
-   українського видання «Дюни» (КСД) належать видавцеві, текст гри — її
+   українського видання «Дюни» належать видавцеві, текст гри — її
    власникам.
 
 
-3. FONTS
-   No font files are included. The letters Ї ї Є є Ґ ґ are added at build time
-   to the fonts already installed with the game, on the user's own machine.
+3. FONTS  (in release builds only)
+   A release build contains the game's 8 UI fonts (Font/*.fnt and Font/*.png
+   inside res.compressed1.pak) with the letters Ї ї Є є Ґ ґ added. They derive
+   from Philosopher, Monda, Noto Sans and Noto Sans CJK, which are licensed
+   under the SIL Open Font License 1.1, and are distributed under the same
+   licence. Copyright notices and the licence text: licenses/OFL.txt, also
+   included in every release.
+
+   Українською. Збірка містить 8 шрифтів інтерфейсу гри з доданими літерами
+   Ї ї Є є Ґ ґ. Вони походять зі шрифтів Philosopher, Monda, Noto Sans і
+   Noto Sans CJK під ліцензією SIL Open Font License 1.1 і поширюються на тих
+   самих умовах (licenses/OFL.txt, є в кожній збірці).
 
 
-NOT INCLUDED
+4. GAME TEXT  (in release builds only)
+   The game accepts a translated line only together with the English it was
+   translated from (lang/old/export_fr_old.xml inside res.compressed1.pak), so
+   a release build contains the English of the translated lines. That text
+   belongs to the game's owners and is included for this purpose only.
 
-This repository contains no files from the game. The build reads a copy you
-already own and writes the patch next to it; it ships nothing of Shiro Games'
-or Funcom's work.
+   Українською. Гра приймає перекладений рядок лише разом з англійським
+   оригіналом, з якого його перекладено, тому збірка містить англійський текст
+   перекладених рядків. Він належить власникам гри й потрібен лише для цього.
+
+
+THIS REPOSITORY
+
+This repository contains no files from the game. Its tools read a copy you
+already own and write the patch next to it.
 
 Dune: Spice Wars is © Shiro Games, published by Funcom. Dune is © Herbert
 Properties LLC. This project is an unofficial community translation and is not
