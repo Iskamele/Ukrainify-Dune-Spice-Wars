@@ -101,6 +101,7 @@
 | `tools/check.py` | перевіряє переклад |
 | `tools/extract.py` | витягає англійський текст гри в `local/` для роботи |
 | `tools/merge.py` | вливає нову порцію перекладу |
+| `tools/prima.py` | перетворює вивантаження з Prima (CSV) на порцію для `merge.py`: `py tools/prima.py <файл.csv> > порція.tsv` |
 | `tools/review.py` | вивантажує переклад у таблицю Excel для редагування й забирає правки назад |
 | `tools/proof.py`, `tools/proof.html` | веде таблицю ручної редактури (`translation/proofreading.csv`): правки й позначки; `--web` показує її в браузері по рядку |
 | `tools/status.py` | рахує поступ перекладу й редактури та оновлює значки в цьому README |
